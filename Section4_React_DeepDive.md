@@ -31,14 +31,14 @@ ReactDOM.createRoot(entryPoint).render(React.createElement(App));
 ```
 
 # 💡Working with Fragments
-Using Fragment is to minimize to much html element of the source of codes
+Using Fragment is to minimize too much html elements like div in the source of codes
 
 First step here on App.jsx we can add fragments on import 
 ```javascript
 import { useState, Fragment } from 'react';
 ```
 
-and then the <div></div> on code after return ( we can replace by using Fragment
+and then the div elements on code after 'return ()', we can replace by using Fragment
 
 from :
 
@@ -62,7 +62,7 @@ return (
     </Fragment>
 ```
 
-or the simplest way is just or not mention the Fragment on import above, we just mention the <></> like below. And React still recognize this as a Fragment
+or the simplest way is just not to mention the Fragment on import above, we just mention the <></> like below. And React still recognize this as a Fragment
 
 ```javascript
     <>
