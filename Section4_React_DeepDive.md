@@ -35,11 +35,11 @@ First step here on App.jsx we can add fragments on import
 ```javascript
 import { useState, Fragment } from 'react';
 ```
-```md
+
 and then the <div></div> on code after return ( we can replace by <Fragment></Fragment>
 
 from :
-```
+
 ```javascript
 return (
     <div>
@@ -47,9 +47,9 @@ return (
       </main>
     </div>
 ```
-```md
+
 to :
-```
+
 ```javascript
 return (
     <Fragment>
@@ -58,4 +58,15 @@ return (
      *.... codes*
     </main>
     </Fragment>
+```
+
+or the simplest way is just or not mention the Fragment on import above, we just mention the <></> like below. And React still recognize this as a Fragment
+
+```javascript
+    <>
+    <Header />
+    <main>
+     codes.......
+    </main>
+    </>
 ```
