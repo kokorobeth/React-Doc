@@ -45,7 +45,7 @@ from :
 ```javascript
 return (
     <div>
-    Header />
+    <Header />
     <main>
       *... codes*
       </main>
