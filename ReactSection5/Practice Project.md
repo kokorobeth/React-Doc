@@ -262,3 +262,9 @@ export default function UserInput() {
 }
 ```
 </details>
+
+<details>
+<summary>Handling Events & Using Two-Way-Binding</summary>
+
+In this section we still concern on UserInput.jsx and we should adding useState 
+</details>
