@@ -432,8 +432,6 @@ export default App
 ofcourse we need to update again data on UserInput.jsx file, by passing or changing the handleChange into onChange because we include it into props, another case is to add also the props e.g userInput
 
 ```javascript
-import { useState } from "react";
-
 export default function UserInput({onChange, userInput}) {
     
     return <section id="user-input">
@@ -492,8 +490,11 @@ export default function UserInput({onChange, userInput}) {
 also adding userInput on App.jsx in <UserInput :
 
 ```javascript
+
+import { useState } from "react";
 import Header from "./components/Header.jsx";
 import UserInput from "./components/UserInput.jsx";
+import Results from "./components/Results.jsx";
 
 function App() {
   const [userInput, setUserInput] = useState({
@@ -516,12 +517,13 @@ function App() {
     <>
     <Header />
     <UserInput userInput={userInput} onChange={handleChange}/>
-    {/* results go here */}
+    <Results input={userInput} />
     </>
   )
 }
 
 export default App
+
 
 ```
 
@@ -556,8 +558,11 @@ export default function Results({ input }) {
 and on App.jsx we need to add mark plus / + before newValue
 
 ```javascript
+
+import { useState } from "react";
 import Header from "./components/Header.jsx";
 import UserInput from "./components/UserInput.jsx";
+import Results from "./components/Results.jsx";
 
 function App() {
   const [userInput, setUserInput] = useState({
@@ -586,6 +591,7 @@ function App() {
 }
 
 export default App
+
 
 ```
 
