@@ -596,3 +596,11 @@ export default App
 ```
 
 </details>
+
+<details>
+<summary>Outputting Results in a List & Deriving More Values</summary>
+
+And here in Results.jsx file we update into table for the results below :
+
+
+</details>
