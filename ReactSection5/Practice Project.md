@@ -524,4 +524,69 @@ function App() {
 export default App
 
 ```
+
+While this is the file of Results.jsx
+
+```javascript
+export default function Results({ input }) {
+    console.log(input);
+    return <p>Results...</p>
+}
+```
+
+</details>
+
+<details>
+<summary>Computing Values & Properly Handling Number Values</summary>
+
+So here in Results.jsx file we can update the code and import from investment.js
+
+```javascript
+import { calculateInvestmentResults } from './../util/investment.js';
+
+export default function Results({ input }) {
+    const resultsData = calculateInvestmentResults(input);
+
+    console.log(resultsData);
+
+    return <p>Results...</p>
+}
+```
+
+and on App.jsx we need to add mark plus / + before newValue
+
+```javascript
+import Header from "./components/Header.jsx";
+import UserInput from "./components/UserInput.jsx";
+
+function App() {
+  const [userInput, setUserInput] = useState({
+        initialInvestment: 10000,
+        annualInvestment: 1200,
+        expectedReturn: 6,
+        duration: 10
+  });
+
+  function handleChange({inputIdentifier, newValue}) {
+        setUserInput(prevUserInput => {
+            return {
+                ...prevUserInput,
+                [inputIdentifier]: +newValue
+            };
+        });
+  }
+
+  return (
+    <>
+    <Header />
+    <UserInput userInput={userInput} onChange={handleChange}/>
+    <Results input={userInput} />
+    </>
+  )
+}
+
+export default App
+
+```
+
 </details>
