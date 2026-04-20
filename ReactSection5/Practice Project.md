@@ -369,4 +369,159 @@ So we run it, and will be displayed like this :
 
 <details>
 <summary>Lifting State Up</summary>
+
+In this section we will concern to calculate and joining the file of investment.js especially in function calculateInvestmentResult() 
+
+At the first step we create new component file called Results.jsx. But before we do this, we could cust & paste the code below from UserInput.jsx into App.jsx
+
+```javascript
+  function handleChange({inputIdentifier, newValue}) {
+const [userInput, setUserInput] = useState({
+        initialInvestment: 10000,
+        annualInvestment: 1200,
+        expectedReturn: 6,
+        duration: 10
+  });
+
+  function handleChange({inputIdentifier, newValue}) {
+        setUserInput(prevUserInput => {
+            return {
+                ...prevUserInput,
+                [inputIdentifier]: newValue
+            };
+        });
+  }
+```
+
+Then the file of App.jsx updated into :
+
+```javascript
+import Header from "./components/Header.jsx";
+import UserInput from "./components/UserInput.jsx";
+
+function App() {
+  const [userInput, setUserInput] = useState({
+        initialInvestment: 10000,
+        annualInvestment: 1200,
+        expectedReturn: 6,
+        duration: 10
+  });
+
+  function handleChange({inputIdentifier, newValue}) {
+        setUserInput(prevUserInput => {
+            return {
+                ...prevUserInput,
+                [inputIdentifier]: newValue
+            };
+        });
+  }
+
+  return (
+    <>
+    <Header />
+    <UserInput onChange={handleChange}/>
+    {/* results go here */}
+    </>
+  )
+}
+
+export default App
+
+```
+
+ofcourse we need to update again data on UserInput.jsx file, by passing or changing the handleChange into onChange because we include it into props, another case is to add also the props e.g userInput
+
+```javascript
+import { useState } from "react";
+
+export default function UserInput({onChange, userInput}) {
+    
+    return <section id="user-input">
+        <div className="input-group">
+            <p>
+                <label>Initial Investment</label>
+                <input 
+                    type="number" 
+                    required
+                    value={userInput.initialInvestment} 
+                    onChange={(event) => onChange('initialInvestment', event.target.value)
+
+                    } 
+                />
+            </p>
+            <p>
+                <label>Annual Investment</label>
+                <input 
+                    type="number" 
+                    required
+                    value={userInput.annualInvestment} 
+                    onChange={(event) => onChange('annualInvestment', event.target.value)
+
+                    } 
+                />
+            </p>
+        </div>
+        <div className="input-group">
+            <p>
+                <label>Expected Return</label>
+                <input 
+                    type="number" 
+                    required
+                    value={userInput.expectedReturn} 
+                    onChange={(event) => onChange('expectedReturn', event.target.value)
+
+                    } 
+                />
+            </p>
+            <p>
+                <label>Duration</label>
+                <input 
+                    type="number" 
+                    required
+                    value={userInput.duration} 
+                    onChange={(event) => onChange('duration', event.target.value)
+
+                    } 
+                />
+            </p>
+        </div>
+    </section>
+}
+```
+
+also adding userInput on App.jsx in <UserInput :
+
+```javascript
+import Header from "./components/Header.jsx";
+import UserInput from "./components/UserInput.jsx";
+
+function App() {
+  const [userInput, setUserInput] = useState({
+        initialInvestment: 10000,
+        annualInvestment: 1200,
+        expectedReturn: 6,
+        duration: 10
+  });
+
+  function handleChange({inputIdentifier, newValue}) {
+        setUserInput(prevUserInput => {
+            return {
+                ...prevUserInput,
+                [inputIdentifier]: newValue
+            };
+        });
+  }
+
+  return (
+    <>
+    <Header />
+    <UserInput userInput={userInput} onChange={handleChange}/>
+    {/* results go here */}
+    </>
+  )
+}
+
+export default App
+
+```
 </details>
