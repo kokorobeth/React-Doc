@@ -248,3 +248,9 @@ export default function Header() {
 And the styles on web result is still the same.
 
 </details>
+
+<details>
+<summary>Styling React Apps with Vanilla CSS - Props & Cons</summary>
+
+**Vanilla CSS : Advantages & Disadvantages**
+</details>
