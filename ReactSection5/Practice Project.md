@@ -645,4 +645,9 @@ export default function Results({ input }) {
 }
 ```
 
+The results on web :
+
+<img width="331" height="404" alt="image" src="https://github.com/user-attachments/assets/21f2defd-accb-4a17-9801-66d842481414" />
+
+
 </details>
