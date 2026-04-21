@@ -420,5 +420,72 @@ And also the key can be written as a camelCase character. e.g :
 - You need to style every element individually
 - No separation between CSS & JSX code
 
+</details>
 
+<details>
+<summary>Dynamic & Conditional Inline Styles</summary>
+
+We can remove the inline styles from the Header.jsx file as writen in previous lecture. And now we switch into AuthInputs.jsx file. 
+
+First we command out the codes on AuthInputs.jsx for the code //className={emailNotValid ? 'invalid' : undefined} and we try to input the by inline styles
+
+```javascript
+import { useState } from 'react';
+
+export default function AuthInputs() {
+  const [enteredEmail, setEnteredEmail] = useState('');
+  const [enteredPassword, setEnteredPassword] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleInputChange(identifier, value) {
+    if (identifier === 'email') {
+      setEnteredEmail(value);
+    } else {
+      setEnteredPassword(value);
+    }
+  }
+
+  function handleLogin() {
+    setSubmitted(true);
+  }
+
+  const emailNotValid = submitted && !enteredEmail.includes('@');
+  const passwordNotValid = submitted && enteredPassword.trim().length < 6;
+
+  return (
+    <div id="auth-inputs">
+      <div className="controls">
+        <p>
+          <label>Email</label>
+          <input
+            type="email"
+            style={{
+              backgroundColor: emailNotValid ? '#fed2d2' : '#d1d5db'
+            }}
+            //className={emailNotValid ? 'invalid' : undefined}
+            onChange={(event) => handleInputChange('email', event.target.value)}
+          />
+        </p>
+        <p>
+          <label>Password</label>
+          <input
+            type="password"
+            //className={passwordNotValid ? 'invalid' : undefined}
+            onChange={(event) =>
+              handleInputChange('password', event.target.value)
+            }
+          />
+        </p>
+      </div>
+      <div className="actions">
+        <button type="button" className="text-button">
+          Create a new account
+        </button>
+        <button className='button' onClick={handleLogin}>Sign In</button>
+      </div>
+    </div>
+  );
+}
+
+```
 </details>
