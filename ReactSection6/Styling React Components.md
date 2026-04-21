@@ -510,7 +510,6 @@ So in the other way, you can add also ternary expression on a label like this
           />
         </p>
 ```
-</details>
 
 We can see the details here :
 
@@ -577,4 +576,14 @@ export default function AuthInputs() {
 When we try to click the button and the text is still empty, it would response such this picture below :
 
 <img width="353" height="403" alt="image" src="https://github.com/user-attachments/assets/589ce846-f1b9-49f6-80db-7a9f74022056" />
+
+</details>
+
+<details>
+<summary>Scoping CSS Rules with CSS Modules</summary>
+
+
+</details>
+
+
 
