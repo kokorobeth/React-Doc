@@ -650,5 +650,50 @@ The results on web :
 
 <img width="331" height="404" alt="image" src="https://github.com/user-attachments/assets/21f2defd-accb-4a17-9801-66d842481414" />
 
+</details>
 
+<details>
+<summary>Outputing Content Conditionally</summary>
+
+In this case we would like to udpate the codes of the duration, to display on the screen, it should be greater than 1, it can not be lesster than 1 like -15 or zero.
+
+```javascript
+
+import { useState } from "react";
+import Header from "./components/Header.jsx";
+import UserInput from "./components/UserInput.jsx";
+import Results from "./components/Results.jsx";
+
+function App() {
+  const [userInput, setUserInput] = useState({
+        initialInvestment: 10000,
+        annualInvestment: 1200,
+        expectedReturn: 6,
+        duration: 10
+  });
+
+  const inputIsValid = userInput.duration >= 1;
+
+  function handleChange(inputIdentifier, newValue) {
+        setUserInput((prevUserInput) => {
+            return {
+                ...prevUserInput,
+                [inputIdentifier]: +newValue
+            };
+        });
+  }
+
+  return (
+    <>
+    <Header />
+    <UserInput userInput={userInput} onChange={handleChange}/>
+    {!inputIsValid && <p className="center">Please enter a duration greater than zero</p> }
+    {inputIsValid && <Results input={userInput} />}
+    </>
+  )
+}
+
+export default App
+
+```
 </details>
