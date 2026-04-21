@@ -510,7 +510,16 @@ So in the other way, you can add also ternary expression on a label like this
           />
         </p>
 ```
+And on Header.css file for a temporary ke can eliminate the code header on p first like this :
 
+```css
+p {
+  text-align: center;
+  color: #a39191;
+  /* color : red; */
+  margin: 0;
+}
+```
 We can see the details here :
 
 ```javascript
@@ -581,6 +590,77 @@ When we try to click the button and the text is still empty, it would response s
 
 <details>
 <summary>Scoping CSS Rules with CSS Modules</summary>
+
+**CSS Modules**
+
+Vanilla CSS with file-specific scoping
+
+We can change first the code p element selector in Header.css into element selector paragraph like this :
+
+Before :
+
+```css
+p {
+  text-align: center;
+  color: #a39191;
+  /* color : red; */
+  margin: 0;
+}
+```
+
+into :
+
+```css
+.paragraph {
+  text-align: center;
+  color: #a39191;
+  /* color : red; */
+  margin: 0;
+}
+```
+
+So in Header.jsx file we can add a className on a paragraph / <p 
+
+```javascript
+import logo from '../assets/logo.png';
+import './Header.css';
+
+export default function Header() {
+  return (
+    <header>
+      <img src={logo} alt="A canvas" />
+      <h1>ReactArt</h1>
+      <p className='paragprah'>A community of artists and art-lovers.</p>
+    </header>
+  );
+}
+
+```
+
+also adding on AuthInputs.jsx 
+
+```javascript
+  return (
+    <div id="auth-inputs">
+      <div className="controls">
+        <p className='paragraph'>
+          <label className={`label ${emailNotValid ? 'invalid' : ''}`}>Email</label>
+          <input
+            type="email"
+            //style={{
+              //backgroundColor: emailNotValid ? '#fed2d2' : '#d1d5db'
+            //}}
+            className={emailNotValid ? 'invalid' : undefined}
+            onChange={(event) => handleInputChange('email', event.target.value)}
+          />
+        </p>
+```
+
+The result on web would be centered for the email label like this :
+
+<img width="281" height="214" alt="image" src="https://github.com/user-attachments/assets/984bab85-45c9-4615-b6ca-e671a1420ce8" />
+
+But how if we rename the file of Header.css into Header.module.css 
 
 
 </details>
