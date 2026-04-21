@@ -253,4 +253,15 @@ And the styles on web result is still the same.
 <summary>Styling React Apps with Vanilla CSS - Props & Cons</summary>
 
 **Vanilla CSS : Advantages & Disadvantages**
+
+**Advantages**
+
+- CSS code is decoupled from JSX code
+- You write CSS code as you (maybe) know and (maybe) love it
+- CSS code can be written by another developer who needs only a minimal amount of access to your JSX code
+
+**Disadvantages**
+
+- You need to know CSS
+- CSS code is not scoped to components --> CSS rules may clash across components (e.g same CSS class name used in different components for different purposes) 
 </details>
