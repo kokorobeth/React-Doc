@@ -265,3 +265,105 @@ And the styles on web result is still the same.
 - You need to know CSS
 - CSS code is not scoped to components --> CSS rules may clash across components (e.g same CSS class name used in different components for different purposes) 
 </details>
+
+<details>
+<summary>Vanilla CSS Styles are NOT Scoped To Components</summary>
+
+In this case (at Header.css file) for example we remove the header on paraghraph from header p to p
+
+from :
+
+``css
+header p {
+  text-align: center;
+  color: #a39191;
+  margin: 0;
+}
+```
+
+to 
+
+```css
+p {
+  text-align: center;
+  color: #a39191;
+  margin: 0;
+}
+```
+
+and the same time we add demo code on *AuthInputs.jsx* file. e.g we add a paragraph **<p> Some Text </p>** 
+
+```javascript
+import { useState } from 'react';
+
+export default function AuthInputs() {
+  const [enteredEmail, setEnteredEmail] = useState('');
+  const [enteredPassword, setEnteredPassword] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleInputChange(identifier, value) {
+    if (identifier === 'email') {
+      setEnteredEmail(value);
+    } else {
+      setEnteredPassword(value);
+    }
+  }
+
+  function handleLogin() {
+    setSubmitted(true);
+  }
+
+  const emailNotValid = submitted && !enteredEmail.includes('@');
+  const passwordNotValid = submitted && enteredPassword.trim().length < 6;
+
+  return (
+    <div id="auth-inputs">
+      <div className="controls">
+        <p>
+          <label>Email</label>
+          <input
+            type="email"
+            className={emailNotValid ? 'invalid' : undefined}
+            onChange={(event) => handleInputChange('email', event.target.value)}
+          />
+        </p>
+        <p>
+          <label>Password</label>
+          <input
+            type="password"
+            className={passwordNotValid ? 'invalid' : undefined}
+            onChange={(event) =>
+              handleInputChange('password', event.target.value)
+            }
+          />
+        </p>
+      </div>
+      <p>Some Text</p>
+      <div className="actions">
+        <button type="button" className="text-button">
+          Create a new account
+        </button>
+        <button className='button' onClick={handleLogin}>Sign In</button>
+      </div>
+    </div>
+  );
+}
+
+```
+
+We try to edit the css code on Header.css and the color become red.
+
+```css
+p {
+  text-align: center;
+  /* color: #a39191; */
+  color : red;
+  margin: 0;
+}
+```
+
+We could see that the text of SOme Text become red, but also the text of A Community ..... also become red
+
+<img width="391" height="402" alt="image" src="https://github.com/user-attachments/assets/afc50940-62e9-4e97-8aa2-a921de0436a9" />
+
+</details>
