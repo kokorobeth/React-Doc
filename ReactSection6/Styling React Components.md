@@ -367,3 +367,42 @@ We could see that the text of SOme Text become red, but also the text of A Commu
 <img width="391" height="402" alt="image" src="https://github.com/user-attachments/assets/afc50940-62e9-4e97-8aa2-a921de0436a9" />
 
 </details>
+
+<details>
+<summary>Styling React Apps with inline Styles</summary>
+
+To make this clear, we try on Header.jsx file, then we fill on p> paragraph the style with a dinamic style using curly bracess the key enouth or directy typed but the value must be filled by string.
+
+We can see this in inline css style code below :
+
+```javascript
+import logo from '../assets/logo.png';
+import './Header.css';
+
+export default function Header() {
+  return (
+    <header>
+      <img src={logo} alt="A canvas" />
+      <h1>ReactArt</h1>
+      <p style={{
+        color : 'red',
+      }}>A community of artists and art-lovers.</p>
+    </header>
+  );
+}
+
+```
+
+save this and see on web. It's red again :
+
+<img width="308" height="372" alt="image" src="https://github.com/user-attachments/assets/a7df67e5-d980-447b-8976-0c3e19ed9676" />
+
+And also the key can be written as a camelCase character. e.g :
+
+```javascript
+<p style={{
+        color : 'red',
+        textAlign: 'left'
+      }}>A community of artists and art-lovers.</p>
+```
+</details>
