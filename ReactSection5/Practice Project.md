@@ -559,6 +559,7 @@ and on App.jsx we need to add mark plus / + before newValue
 
 ```javascript
 
+
 import { useState } from "react";
 import Header from "./components/Header.jsx";
 import UserInput from "./components/UserInput.jsx";
@@ -572,8 +573,8 @@ function App() {
         duration: 10
   });
 
-  function handleChange({inputIdentifier, newValue}) {
-        setUserInput(prevUserInput => {
+  function handleChange(inputIdentifier, newValue) {
+        setUserInput((prevUserInput) => {
             return {
                 ...prevUserInput,
                 [inputIdentifier]: +newValue
