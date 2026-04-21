@@ -405,4 +405,20 @@ And also the key can be written as a camelCase character. e.g :
         textAlign: 'left'
       }}>A community of artists and art-lovers.</p>
 ```
+
+**Inline Styles : Advantages & Disadvantages**
+
+**Advantages**
+
+- Quick & easy to add to JSX
+- Styles only affect the element to which you add them
+- Dynamic (conditional) styling is simple
+
+**Disadvantages**
+
+- You need to know CSS
+- You need to style every element individually
+- No separation between CSS & JSX code
+
+
 </details>
