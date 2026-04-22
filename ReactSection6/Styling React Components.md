@@ -698,5 +698,16 @@ If we see on the browser and we inspect the element, we'll se that there's a wra
 
 </details>
 
+<details>
+<summary>Introducing "Styled Components" (Third-party Package)</summary>
 
+We now explore about styled components, we can visi the website or just type key search on the browser **styled components** or we can visi https://styled-components.com/
+
+In that there some css file components packages. With that, we can install it by using command :
+
+```html
+npm install styled-components
+```
+
+</details>
 
