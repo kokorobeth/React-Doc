@@ -709,5 +709,102 @@ In that there some css file components packages. With that, we can install it by
 npm install styled-components
 ```
 
+So in AuthInputs.jsx file we can update the codes and import like **import { styled } from 'styled-components'**, name styled after import is commonly used, but we can free named as we want. And adding styled.div`` (with backtick) for example. Also actually we can add styled.p etc.
+
+And we go back to index.css file, copy the code below (which inclued of .control) into AuthInputs.jsx file on styled.div ` `
+
+```css
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+```
+
+Note : .control is not copied
+
+So paste in AuthInputs.jsx file into :
+
+```css
+const ControlContainer = display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+```
+And still in AuthInputs.jsx we can replace the code **<div className="controls"** into <ControlContainer>=== codes are here ===</ControlContainer>
+
+```javascript
+import { useState } from 'react';
+import { styled } from 'styled-components';
+
+const ControlContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+`
+
+export default function AuthInputs() {
+  const [enteredEmail, setEnteredEmail] = useState('');
+  const [enteredPassword, setEnteredPassword] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleInputChange(identifier, value) {
+    if (identifier === 'email') {
+      setEnteredEmail(value);
+    } else {
+      setEnteredPassword(value);
+    }
+  }
+
+  function handleLogin() {
+    setSubmitted(true);
+  }
+
+  const emailNotValid = submitted && !enteredEmail.includes('@');
+  const passwordNotValid = submitted && enteredPassword.trim().length < 6;
+
+  return (
+    <div id="auth-inputs">
+      <ControlContainer >
+        <p className='paragraph'>
+          <label className={`label ${emailNotValid ? 'invalid' : ''}`}>Email</label>
+          <input
+            type="email"
+            //style={{
+              //backgroundColor: emailNotValid ? '#fed2d2' : '#d1d5db'
+            //}}
+            className={emailNotValid ? 'invalid' : undefined}
+            onChange={(event) => handleInputChange('email', event.target.value)}
+          />
+        </p>
+        <p>
+          <label className={`label ${emailNotValid ? 'invalid' : ''}`}>Password</label>
+          <input
+            type="password"
+            className={passwordNotValid ? 'invalid' : undefined}
+            onChange={(event) =>
+              handleInputChange('password', event.target.value)
+            }
+          />
+        </p>
+      </ControlContainer>
+      <div className="actions">
+        <button type="button" className="text-button">
+          Create a new account
+        </button>
+        <button className='button' onClick={handleLogin}>Sign In</button>
+      </div>
+    </div>
+  );
+}
+
+```
+
+Note : When we check on the browser, the results are still not proper, but for a while we check and inspect the codes, there is a unique code that wrapped and secured 
+
+And the codes of div on inspect element become <div class="sc-gsTDHW djHafr">
+
 </details>
 
