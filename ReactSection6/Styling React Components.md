@@ -660,8 +660,27 @@ The result on web would be centered for the email label like this :
 
 <img width="281" height="214" alt="image" src="https://github.com/user-attachments/assets/984bab85-45c9-4615-b6ca-e671a1420ce8" />
 
-But how if we rename the file of Header.css into Header.module.css 
+But how if we rename the file of Header.css into Header.module.css. After renamed we can update the codes on Header.jsx file and update the import area from **import './Header.css** into **import *classes* from './Header.moule.css'**. You have to note that the name of **classes** here is up to you. but commonly given name like that. 
 
+and also update the className={classes.paragraph}. Why adding a paragraph? because we have added paragraph name on css file.
+
+```javascript
+import logo from '../assets/logo.png';
+import classes from './Header.module.css';
+
+export default function Header() {
+  return (
+    <header>
+      <img src={logo} alt="A canvas" />
+      <h1>ReactArt</h1>
+      <p className={classes.paragraph}>A community of artists and art-lovers.</p>
+    </header>
+  );
+}
+
+```
+
+If we see on the browser and we inspect the element, we'll se that there's a wrap on <p class="_paragraph_swvrj_28". I'ts the unique codes that's shown on the browser.
 
 </details>
 
