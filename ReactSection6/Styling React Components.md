@@ -804,7 +804,7 @@ export default function AuthInputs() {
 
 Note : When we check on the browser, the results are still not proper, but for a while we check and inspect the codes, there is a unique code that wrapped and secured 
 
-And the codes of div on inspect element become <div class="sc-gsTDHW djHafr">
+And the codes of div on inspect element become **<div class="sc-gsTDHW djHafr"**
 
 </details>
 
