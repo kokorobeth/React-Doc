@@ -682,6 +682,20 @@ export default function Header() {
 
 If we see on the browser and we inspect the element, we'll se that there's a wrap on <p class="_paragraph_swvrj_28". I'ts the unique codes that's shown on the browser.
 
+**CSS Module : Advantages & Disadvantages**
+
+**Advantages**
+
+- CSS code is decoupled from JSX code
+- You write CSS code as you maybe know and maybe love it
+- CSS code can be written by another developer who needs only a minimal amount of access to your JSX code
+- CSS classes are scoped to the component files which import them --> No CSS class name clashes
+
+**Disadvantages**
+
+- You need to know CSS
+- You may end up with many relatively small CSS files in your project
+
 </details>
 
 
