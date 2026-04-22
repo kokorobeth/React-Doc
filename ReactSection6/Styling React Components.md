@@ -732,7 +732,7 @@ const ControlContainer = display: flex;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
 ```
-And still in AuthInputs.jsx we can replace the code **<div className="controls"** into <ControlContainer>=== codes are here ===</ControlContainer>
+And still in AuthInputs.jsx we can replace the code **<div className="controls"** into **<ControlContainer>=== codes are here ===</ControlContainer**
 
 ```javascript
 import { useState } from 'react';
