@@ -868,4 +868,37 @@ into :
 
 ```
 
+So if we take a look on a website after we do a npm run dev, it looks good again. But there's something to fix afterwards. Yet the style input is still broken. So the we need to make a constant again on AuthInputs.jsx file.
+
+And again we need to copy and paste the codes from index.css file into constant code in AuthInputs.jsx file. Such this codes :
+
+```css
+.controls input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  line-height: 1.5;
+  background-color: #d1d5db;
+  color: #374151;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+```
+
+paste them into :
+
+```javascript
+const Input = styled.input`
+  width: 100%;
+  padding: 0.75rem 1rem;
+  line-height: 1.5;
+  background-color: #d1d5db;
+  color: #374151;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+`
+```
+
+
 </details>
