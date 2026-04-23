@@ -808,3 +808,4 @@ And the codes of div on inspect element become **<div class="sc-gsTDHW djHafr"**
 
 </details>
 
+<details>Creating Flexible Components with Styled Components</details>
