@@ -810,4 +810,62 @@ And the codes of div on inspect element become **<div class="sc-gsTDHW djHafr"**
 
 <details>
 <summary>Creating Flexible Components with Styled Components</summary>
+
+In AuthInputs.jsx file we can make a modify again especially in a label by making a variable of label in it
+
+We can copy & paste the codes from index.css for a label into AuthInputs.jsx file
+
+```css
+.controls label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+```
+
+paste in AuthInputs.jsx file
+
+```javascript
+const Label = styled.label`
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+`
+```
+
+After that we can change the label symbol in the code below :
+
+```javascript
+<label className={`label ${emailNotValid ? 'invalid' : ''}`}>
+Email
+</label>
+
+<Label className={`label ${emailNotValid ? 'invalid' : ''}`}>
+Password
+</Label>
+```
+
+into :
+
+```javascript
+<Label className={`label ${emailNotValid ? 'invalid' : ''}`}>
+`Email
+</Label>
+
+===another codes is here ===
+
+<Label className={`label ${emailNotValid ? 'invalid' : ''}`}>
+  Password
+</Label>
+
+```
+
 </details>
