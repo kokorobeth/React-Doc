@@ -1381,6 +1381,8 @@ And ofcourse we can copy and paste the button css code in index.css and also we 
 
 Here is the modified codes of AuthInputs.jsx
 
+Note : we can eliminate also the className=? in <Button
+
 ```javascript
 import { useState } from 'react';
 import { styled } from 'styled-components';
