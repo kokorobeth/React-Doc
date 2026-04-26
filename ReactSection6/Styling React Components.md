@@ -1491,4 +1491,6 @@ export default function AuthInputs() {
 
 ```
 
+In the end, we check into web and we'll see the button **SIGN IN** is styled hover.
+
 </details>
