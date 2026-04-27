@@ -1787,4 +1787,44 @@ Make sure your compiled CSS is included in the <head> (your framework might hand
 </body>
 </html>
 ```
+
+It's time to practice, first we can run a command :
+
+We can directly install the Tailwindcss, 
+
+Note : If the vite is outdated we can re-install again such this commands :
+
+```md
+npm install vite@latest
+```
+
+we can immediately install the tailwind. There are to ways to install it by using command 
+
+```css
+npm install tailwindcss @tailwindcss/vite
+```
+
+Or
+
+```css
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+But the first way is recomended
+
+We try to install it now :
+
+```css
+user@aziz MINGW64 /d/course/udemy/react/Section6/01-starting-project
+$ npm install tailwindcss @tailwindcss/vite
+
+added 20 packages, and audited 280 packages in 4s
+
+120 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+```
 </details>
