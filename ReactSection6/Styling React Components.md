@@ -1969,7 +1969,7 @@ Note : But before we should install **Tailwind CSS IntelliSense** on our Visual 
 </details>
 
 <details>
-<summary>Tailwin 3 Vs 4</summary>
+<summary>Tailwind 3 Vs 4</summary>
 
 Tailwind 3 vs 4
 The next lecture were recorded with Tailwind v3 being used.
