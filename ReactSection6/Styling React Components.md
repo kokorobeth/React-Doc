@@ -1494,3 +1494,123 @@ export default function AuthInputs() {
 In the end, we check into web and we'll see the button **SIGN IN** is styled hover.
 
 </details>
+
+<details>
+<summary>Creating Reusable Components & Component Combinations</summary>
+
+If we see in AuthInputs.jsx file, there so many css codes. To solve this we should create a new separate file. Here for example we create Button.jsx, Input.jsx and Label.jsx files for a separate css. We put it in **components** folder.
+
+First in a Button.jsx file we paste the css codes from AuthInputs.jsx file. also import the styled and export it.
+
+== Button.jsx ==
+
+```javascript
+import { styled } from 'styled-components';
+
+const Button = styled.button`
+  padding: 1rem 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+  color: #1f2937;
+  background-color: #f0b322;
+  border-radius: 6px;
+  border: none;
+
+  &:hover {
+    background-color: #f0920e;
+  }
+`;
+
+export default Button;
+```
+
+And don't forget to put the import code in AuthInputs.jsx file for the Button.jsx file
+
+== AuthInputs.jsx == for the import Button.jsx file
+
+```javascript
+import Button from './Button.jsx';
+```
+
+We could do the same on a Input.jsx file. We can cut & paste the const Label and Input into Input.jsx file from AuthInput.jsx file. Also import the styled, but here we can create an export function. We name it e.g function CustomInput() that returns the paragraph and also adding the props e.g `{label, ...props}`
+
+=== Input.jsx ===
+
+```javascript
+import { styled } from 'styled-components';
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: ${({$invalid}) => $invalid ? '#f87171' :'#6b7280'} ;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 0.75rem 1rem;
+  line-height: 1.5;
+  background-color: ${({$invalid}) => $invalid ? '#fed2d2' : '#d1d5db'};
+  color: ${({$invalid}) => $invalid ? '#ef4444' : '#374151'};
+  border: 1px solid ${({$invalid}) => $invalid ? '#f73f3f' : 'transparent'} ;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+`;
+
+export default function CustomInput({label, invalid, ...props}) {
+    return <p>
+        <Label $invalid = {invalid}>{label}</Label>
+        <Input $invalid = {invalid} {...props} />
+    </p>
+}
+```
+
+Also we put the import Input.jsx into AuthInputs.jsx
+
+```javascript
+import Input from './Input.jsx';
+```
+
+And we can delete some codes from AuthInput.jsx file
+
+```javascript
+<p className='paragraph'>
+<Label $invalid={emailNotValid}>Email</Label>
+</p>
+
+<p>
+<Label $invalid={passwordNotValid}>Password</Label>
+</p>
+```
+
+And change (update) to props codes below in AUthInput.jsx file 
+
+```javascript
+<Input
+            label="Email"
+            invalid={emailNotValid}
+            type="email"
+            //style={{
+              //backgroundColor: emailNotValid ? '#fed2d2' : '#d1d5db'
+            //}}
+            className={emailNotValid ? 'invalid' : undefined}
+            onChange={(event) => handleInputChange('email', event.target.value)}
+          />
+        
+          <Input
+            invalid={passwordNotValid}
+            label="Password"
+            type="password"
+            className={passwordNotValid ? 'invalid' : undefined}
+            onChange={(event) =>
+              handleInputChange('password', event.target.value)
+            }
+```
+When we visi the website of http://localhost:5173/ , The details of the input and labels are still the same.
+
+
+</details>
