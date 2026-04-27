@@ -1591,24 +1591,25 @@ And change (update) to props codes below in AUthInput.jsx file
 
 ```javascript
 <Input
-            label="Email"
-            invalid={emailNotValid}
-            type="email"
-            //style={{
-              //backgroundColor: emailNotValid ? '#fed2d2' : '#d1d5db'
-            //}}
-            className={emailNotValid ? 'invalid' : undefined}
-            onChange={(event) => handleInputChange('email', event.target.value)}
-          />
+  label="Email"
+  invalid={emailNotValid}
+  type="email"
+  //style={{
+  //backgroundColor: emailNotValid ? '#fed2d2' : '#d1d5db'
+  //}}
+  className={emailNotValid ? 'invalid' : undefined}
+  onChange={(event) => handleInputChange('email', event.target.value)}
+/>
         
-          <Input
-            invalid={passwordNotValid}
-            label="Password"
-            type="password"
-            className={passwordNotValid ? 'invalid' : undefined}
-            onChange={(event) =>
-              handleInputChange('password', event.target.value)
-            }
+<Input
+  invalid={passwordNotValid}
+  label="Password"
+  type="password"
+  className={passwordNotValid ? 'invalid' : undefined}
+  onChange={(event) =>
+  handleInputChange('password', event.target.value)
+}
+/>
 ```
 When we visi the website of http://localhost:5173/ , The details of the input and labels are still the same.
 
