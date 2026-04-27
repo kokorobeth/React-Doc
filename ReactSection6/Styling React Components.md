@@ -1695,5 +1695,10 @@ export default function AuthInputs() {
 - You continue "thinking in React" --> configurable style functions
 - Styles are scoped to components --> No CSS rules clashes
 
+== Disadvantages ==
+
+- You need to know CSS
+- No clear separation of React & CSS Code
+- You end up with many relatively small wrapper components
 
 </details>
