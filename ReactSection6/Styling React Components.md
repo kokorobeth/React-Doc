@@ -1966,5 +1966,23 @@ Run the command **npm run dev** and the result is still the same
 
 Note : But before we should install **Tailwind CSS IntelliSense** on our Visual Studio code in our project.
 
+</details>
 
+<details>
+<summary>Tailwin 3 Vs 4</summary>
+
+Tailwind 3 vs 4
+The next lecture were recorded with Tailwind v3 being used.
+
+To follow along smoothly, it's therefore recommended to also use that version. You find the setup documentation (which I also show in the next lectures) here: https://v3.tailwindcss.com/docs/installation.
+
+Important: To install v3, use the below command (besides that, follow the instructions from the above link):
+
+```md
+npm install -D tailwindcss@3 postcss autoprefixer
+npx tailwindcss@3 init -p 
+(the @3 is important!)
+```
+
+Please note: This has nothing to do with the React version being used! All the code works with the latest React version.
 </details>
