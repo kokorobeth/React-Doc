@@ -1993,4 +1993,33 @@ Please note: This has nothing to do with the React version being used! All the c
 This section is actually different in tutorial video. Because it's old one.
 
 But We use the newest step for tailwind installation. So that has been explained in previous Section before this section.
+
+But here for a temporary, we can modify first the Header.jsx file into. And we can remove the css codes in it and also the imports
+
+```javascript
+
+import logo from '../assets/logo.png';
+
+export default function Header() {
+  return (
+    <header className='flex flex-col items-center mt-8 mb-16'>
+      <img 
+        src={logo} 
+        alt="A canvas"
+        className='object-contain mb-8 w-44 h-44' />
+      <h1 className='text-4xl font-semibold tracking-widest text-center uppercase text-amber-800 font-title'>ReactArt</h1>
+      <p className={classes.paragraph}>A community of artists and art-lovers.</p>
+    </header>
+  );
+}
+
+```
+</details>
+
+<details>
+<summary>Tailwind : Media Queries & Pseudo Selectors</summary>
+
+In this case we would like to modify the code of Button.jsx file.
+
+
 </details>
