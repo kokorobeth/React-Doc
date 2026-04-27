@@ -1827,4 +1827,6 @@ added 20 packages, and audited 280 packages in 4s
 found 0 vulnerabilities
 
 ```
+
+Note : If we still use the old command like *npm install -D tailwindcss postcss autoprefixer* and *npx tailwindcss init -p*. After we did it, we could find the two new files on our project. Usually the name is postcss.confi.js and tailwind.config.css
 </details>
