@@ -1986,3 +1986,11 @@ npx tailwindcss@3 init -p
 
 Please note: This has nothing to do with the React version being used! All the code works with the latest React version.
 </details>
+
+<details>
+<summary>Adding & Using Tailwind CSS In A React Project</summary>
+
+This section is actually different in tutorial video. Because it's old one.
+
+But We use the newest step for tailwind installation. So that has been explained in previous Section before this section.
+</details>
