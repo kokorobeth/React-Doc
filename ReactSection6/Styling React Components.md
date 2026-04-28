@@ -2151,3 +2151,24 @@ export default function AuthInputs() {
 ```
 
 </details>
+
+<details>
+<summary>Tailwind CSS : Props & Cons</summary>
+
+Tailwind CSS : Advantages & Disadvantages
+
+== Advantages ===
+
+- You don't need to know a lot about CSS
+- Rapid development
+- No style clashes between components since you don't define any CSS rules
+- Highly configurable & extensible
+
+=== Disadvantages ===
+
+- Relatively longName values
+- Any style changes require editing JSX
+- You end up with many relatively small wrapper components or lots of copy & pasting
+
+
+</details>
