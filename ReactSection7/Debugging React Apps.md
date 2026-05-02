@@ -97,4 +97,11 @@ So when we check the browser after *npm run dev*, there is nor crash error again
 
 </details>
 
+<details>
+<summary>Using the Browser Debugger & Breakpoints</summary>
 
+In this case we only explore about the codes on inpections area, after we inspect them. We would see the codes on the browser. And jump to the Sources section.
+
+Note : Analyze and solve it!
+
+</details>
