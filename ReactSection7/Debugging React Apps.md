@@ -206,5 +206,4 @@ Profiler and Components
 
 <img width="133" height="222" alt="image" src="https://github.com/user-attachments/assets/1e151685-6e4f-40f9-afd3-6911c03eb56b" />
 
-
 </details>
