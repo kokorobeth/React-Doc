@@ -22,6 +22,10 @@ In this lesson we would like to use the previous material in **Investment Calcul
 
 In this lesson we would like to use the previous material in **Investment Calculator** as we learned before. 
 
+The source codes link is here :
+
+https://github.com/academind/react-complete-guide-course-resources/blob/main/attachments/06%20Debugging/01-starting-project.zip
+
 </details>
 
 
