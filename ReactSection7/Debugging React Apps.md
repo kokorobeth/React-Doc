@@ -190,3 +190,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 ```
 </details>
+
+<details>
+<summary>Using the React DevTools (Browser Extension)</summary>
+
+
+</details>
