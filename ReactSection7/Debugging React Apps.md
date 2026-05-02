@@ -194,5 +194,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 <details>
 <summary>Using the React DevTools (Browser Extension)</summary>
 
+In this section we would like to install react devtools. Here we can search on the google browser for **react devtools**
+
+CLicking it and add to chrome 
+
+Here is the link : https://chromewebstore.google.com/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en
+
+After we add to chrome, we inspect it we could see two elements shown on that 
+
+<img width="133" height="222" alt="image" src="https://github.com/user-attachments/assets/1e151685-6e4f-40f9-afd3-6911c03eb56b" />
+
 
 </details>
