@@ -105,3 +105,88 @@ In this case we only explore about the codes on inpections area, after we inspec
 Note : Analyze and solve it!
 
 </details>
+
+<details>
+<summary>Understanding React's Strict Mode</summary>
+
+In this section. There's a changes on Results.jsx file like we show below here :
+
+```javascript
+import { calculateInvestmentResults, formatter } from '../util/investment.js';
+
+const results = [];
+
+export default function Results({ input }) {
+  calculateInvestmentResults(input, results);
+
+  if (results.length === 0) {
+    return <p className="center">Invalid input data provided.</p>
+  }
+
+  const initialInvestment =
+    results[0].valueEndOfYear -
+    results[0].interest -
+    results[0].annualInvestment;
+
+  return (
+    <table id="result">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Investment Value</th>
+          <th>Interest (Year)</th>
+          <th>Total Interest</th>
+          <th>Invested Capital</th>
+        </tr>
+      </thead>
+      <tbody>
+        {results.map((yearData) => {
+          const totalInterest =
+            yearData.valueEndOfYear -
+            yearData.annualInvestment * yearData.year -
+            initialInvestment;
+          const totalAmountInvested = yearData.valueEndOfYear - totalInterest;
+
+          return (
+            <tr key={yearData.year}>
+              <td>{yearData.year}</td>
+              <td>{formatter.format(yearData.valueEndOfYear)}</td>
+              <td>{formatter.format(yearData.interest)}</td>
+              <td>{formatter.format(totalInterest)}</td>
+              <td>{formatter.format(totalAmountInvested)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+```
+
+Source link : https://github.com/academind/react-complete-guide-course-resources/blob/main/attachments/06%20Debugging/Results.jsx
+
+But when we see on the browser, it seems to be longer result on there. 
+
+Using strict mode typically start from index.jsx file
+
+And we can wrap the <App component by using <StrictMode
+
+And it can catch some certain problem in our apps.
+
+As we see below :
+
+```javascript
+import { StrictMode } from 'react';
+import ReactDOM from 'react-dom/client';
+
+import App from './App.jsx';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+    <StrictMode>
+        <App />
+    </StrictMode>
+);
+
+```
+</details>
