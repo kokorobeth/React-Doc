@@ -93,6 +93,8 @@ export default function Results({ input }) {
 
 ```
 
+So when we check the browser after *npm run dev*, there is nor crash error again when we input the zero value or negative values.
+
 </details>
 
 
