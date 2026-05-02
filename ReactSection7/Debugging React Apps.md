@@ -114,9 +114,9 @@ In this section. There's a changes on Results.jsx file like we show below here :
 ```javascript
 import { calculateInvestmentResults, formatter } from '../util/investment.js';
 
-const results = [];
 
 export default function Results({ input }) {
+  const results = [];
   calculateInvestmentResults(input, results);
 
   if (results.length === 0) {
