@@ -81,7 +81,11 @@ Note : The codes above is not a greate way to write there, will continue in the 
 <details>
 <summary>Repetition : Fragments</summary>
 
-In earlier versions of this course, this section also introduced the concept of "React Fragments" (<Fragment> ... </Fragment> or <> ... </>).
+In earlier versions of this course, this section also introduced the concept of "React Fragments" (
+
+```javascript
+<Fragment> ... </Fragment> or <> ... </>).
+```
 
 The newer version of the course already introduced this concept in the "React Essentials" sections.
 
