@@ -49,7 +49,7 @@ The code of Player.jsx after we add useState and also we should add a function l
 import { useState } from 'react';
 
 export default function Player() {
-  const [enteredPlayerName, setEnteredPlayerName] = useState('');
+  const [enteredPlayerName, setEnteredPlayerName] = useState(null);
   const [submitted, setSubmitted] = useState(falsee);
 
   function handleChange(event) {
@@ -160,6 +160,40 @@ return (
 );
 ```
 
+</details>
 
+<details>
+<summary>Introducing Refs : Connecting & Accessing HTML elements via Refs</summary>
+
+We still process on Player.jsx file. First we just importing useRef
+
+And here is the codes after modified again, important to note when we run on the browser, so we input our name, it would be displayed on it as we can see below capture.
+
+```javascript
+import { useState, useRef } from 'react';
+
+export default function Player() {
+  const PlayerName = useRef();
+
+  const [enteredPlayerName, setEnteredPlayerName] = useState(null);
+
+  function handleClick() {
+    setEnteredPlayerName(PlayerName.current.value);
+  }
+
+  return (
+    <section id="player">
+      <h2>Welcome {enteredPlayerName ?? 'unknown entiry'}</h2>
+      <p>
+        <input ref={PlayerName} type="text" />
+        <button onClick={handleClick}>Set Name</button>
+      </p>
+    </section>
+  );
+}
+
+```
+
+<img width="694" height="297" alt="image" src="https://github.com/user-attachments/assets/b6a2c5db-cde0-4bb9-9825-e7cd01a834c4" />
 
 </details>
