@@ -18,5 +18,8 @@ and then **npm run dev** to know what is inside
 
 <img width="475" height="159" alt="image" src="https://github.com/user-attachments/assets/adac3a56-ca40-403e-bb0b-e34177427de3" />
 
+</details>
 
+<details>
+<summary>Repetition : Managing User Input with State (Two Way-Binding)</summary>
 </details>
