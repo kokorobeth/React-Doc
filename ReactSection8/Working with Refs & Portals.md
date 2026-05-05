@@ -197,3 +197,35 @@ export default function Player() {
 <img width="694" height="297" alt="image" src="https://github.com/user-attachments/assets/b6a2c5db-cde0-4bb9-9825-e7cd01a834c4" />
 
 </details>
+
+<details>
+<summary>Manipulating the DOM via Refs</summary>
+
+First we should input on handleClick at Player.jsx file some codes playerName.current.value = ''. We have to set the value into an empty string.
+
+```javascript
+import { useState, useRef } from 'react';
+
+export default function Player() {
+  const PlayerName = useRef();
+
+  const [enteredPlayerName, setEnteredPlayerName] = useState(null);
+
+  function handleClick() {
+    setEnteredPlayerName(PlayerName.current.value);
+    PlayerName.current.value = '';
+  }
+
+  return (
+    <section id="player">
+      <h2>Welcome {enteredPlayerName ?? 'unknown entiry'}</h2>
+      <p>
+        <input ref={PlayerName} type="text" />
+        <button onClick={handleClick}>Set Name</button>
+      </p>
+    </section>
+  );
+}
+
+```
+</details>
