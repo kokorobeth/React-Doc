@@ -229,3 +229,9 @@ export default function Player() {
 
 ```
 </details>
+
+<details>
+<summary>Refs vs State Values</summary>
+
+
+</details>
