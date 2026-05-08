@@ -367,3 +367,7 @@ So the results should be :
 
 
 </details>
+
+<details>
+<summary>Setting Timers & Managing Setup</summary>
+</details>
