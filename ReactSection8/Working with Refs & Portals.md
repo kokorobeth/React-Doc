@@ -310,3 +310,7 @@ Note : The logic on h2 we change like above codes, and the result is different. 
 The we should go back into the first code to make it normal again.
 
 </details>
+
+<details>
+<summary>Adding Challenges to the Demo Project</summary>
+</details>
