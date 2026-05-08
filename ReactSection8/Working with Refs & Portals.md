@@ -316,5 +316,54 @@ The we should go back into the first code to make it normal again.
 
 To know about this lesson deeper. We should create a new file on a component folder. Here for example we create TimerChallenge.jsx file
 
+```javascript
+export default function TimerChallenge({ title, targetTime }) {
+    return (
+        <section className="challenge">
+            <h2>{title}</h2>
+            <p className="challenge-time">
+                {targetTime} second{targetTime > 1 ? 's' : ''}
+            </p>
+            <p>
+                <button>
+                    Start Challenge
+                </button>
+            </p>
+            <p className="">
+                Time is running... / Timer innactive
+            </p>
+        </section>
+    )
+}
+```
+
+So on App.jsx file we could add TimerChallenge
+
+```javascript
+import Player from './components/Player.jsx';
+import TimerChallenge from './components/TimerChallenge.jsx';
+
+function App() {
+  return (
+    <>
+      <Player />
+      <div id="challenges">
+        <TimerChallenge title="Easy" targetTime={1} />
+        <TimerChallenge title="Not Easy" targetTime={5} />
+        <TimerChallenge title="Getting tough" targetTime={10} />
+        <TimerChallenge title="Pros Only" targetTime={15} />
+      </div>
+    </>
+  );
+}
+
+export default App;
+
+```
+
+So the results should be :
+
+![alt text](image.png)
+
 
 </details>
