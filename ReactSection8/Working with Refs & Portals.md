@@ -313,4 +313,8 @@ The we should go back into the first code to make it normal again.
 
 <details>
 <summary>Adding Challenges to the Demo Project</summary>
+
+To know about this lesson deeper. We should create a new file on a component folder. Here for example we create TimerChallenge.jsx file
+
+
 </details>
