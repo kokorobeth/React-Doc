@@ -233,5 +233,80 @@ export default function Player() {
 <details>
 <summary>Refs vs State Values</summary>
 
+**State**
+
+- Causes component re-evaluation (re-execution) when changed
+- Should be used for values that are directly reflected in the UI
+- Should not be used for "Behind the scenes" values that have no direct UI impact
+
+**Refs**
+
+- Do not cause component re-evaluation when changed
+- Can be used to gain direct DOM element access (-> gret for reading values or accessing certain browsers APIs)
+
+
+For instance we can command the codes below and change some codes on return on a Player.jsx file
+
+From 
+
+```javascript
+import { useState, useRef } from 'react';
+
+export default function Player() {
+  const PlayerName = useRef();
+
+  const [enteredPlayerName, setEnteredPlayerName] = useState(null);
+
+  function handleClick() {
+    setEnteredPlayerName(PlayerName.current.value);
+    PlayerName.current.value = '';
+  }
+
+  return (
+    <section id="player">
+      <h2>Welcome {enteredPlayerName ?? 'unknown entiry'}</h2>
+      <p>
+        <input ref={PlayerName} type="text" />
+        <button onClick={handleClick}>Set Name</button>
+      </p>
+    </section>
+  );
+}
+
+```
+
+To 
+
+```javascript
+import { useState, useRef } from 'react';
+
+export default function Player() {
+  const PlayerName = useRef();
+
+  //const [enteredPlayerName, setEnteredPlayerName] = useState(null);
+
+  function handleClick() {
+    //setEnteredPlayerName(PlayerName.current.value);
+    PlayerName.current.value = '';
+  }
+
+  return (
+    <section id="player">
+      <h2>Welcome {PlayerName.current ? PlayerName.current.value : 'unknown entiry'}</h2>
+      <p>
+        <input ref={PlayerName} type="text" />
+        <button onClick={handleClick}>Set Name</button>
+      </p>
+    </section>
+  );
+}
+
+```
+
+Note : The logic on h2 we change like above codes, and the result is different. WHen we input our name. There's no change on there.
+
+<img width="584" height="230" alt="image" src="https://github.com/user-attachments/assets/2de1d59e-e1d3-4084-b84c-849ac32ba42e" />
+
+The we should go back into the first code to make it normal again.
 
 </details>
