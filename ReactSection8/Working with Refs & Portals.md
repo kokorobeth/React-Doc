@@ -419,4 +419,6 @@ So if we check on the browser, the display should be :
 
 <details>
 <summary>Using Refs for more than DOM Element Connections</summary>
+
+
 </details>
