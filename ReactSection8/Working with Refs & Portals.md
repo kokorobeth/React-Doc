@@ -416,3 +416,7 @@ So if we check on the browser, the display should be :
 ![alt text](image-1.png)
 
 </details>
+
+<details>
+<summary>Using Refs for more than DOM Element Connections</summary>
+</details>
