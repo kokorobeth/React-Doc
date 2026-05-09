@@ -371,7 +371,7 @@ So the results should be :
 <details>
 <summary>Setting Timers & Managing State</summary>
 
-Here on TimerChallenge.jsx file, we should puth handle function like handleStart and adding useState and so on.
+Here on TimerChallenge.jsx file, we should put some handles function like handleStart and adding useState and so on.
 
 ```javascript
 import { useState } from "react";
@@ -410,5 +410,9 @@ export default function TimerChallenge({ title, targetTime }) {
     )
 }
 ```
+
+So if we check on the browser, the display should be :
+
+![alt text](image-1.png)
 
 </details>
