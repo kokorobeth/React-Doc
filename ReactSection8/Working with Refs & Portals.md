@@ -584,4 +584,78 @@ export default function TimerChallenge({ title, targetTime }) {
 
 <details>
 <summary>Forwarding Refs To Custom Components</summary>
+
+On TimerChallenge.jsx file we need to useRef again to const dialog and adding ref={dialog} on a tag of ResultModal. And here are some codes to be altered.
+
+```javascript
+import { useState, useRef } from "react";
+import ResultModal from "./ResultModal";
+
+// let timer;
+
+export default function TimerChallenge({ title, targetTime }) {
+    const timer = useRef();
+    const dialog = useRef();
+
+    const [timerStarted, setTimerStarted] = useState(false);
+    const [timerExpired, setTimerExpired] = useState(false);
+
+    function handleStart() {
+        timer.current = setTimeout(() => {
+            setTimerExpired(true);
+            dialog.current.showModal();
+        }, targetTime * 1000);
+
+        setTimerStarted(true);
+    }
+
+    function handleStop() {
+        clearTimeout(timer.current);
+    }
+    return (
+        <>
+            <ResultModal ref={dialog} targetTime={targetTime} result="lost" />
+            <section className="challenge">
+                <h2>{title}</h2>
+                <p className="challenge-time">
+                {targetTime} second{targetTime > 1 ? 's' : ''}
+                </p>
+                <p>
+                <button onClick={timerStarted ? handleStop : handleStart}>
+                {timerStarted ? 'Stop' : 'Start'} Challenge
+                </button>
+                </p>
+                <p className={timerStarted ? 'active' : undefined}>
+                {timerStarted? 'Time is running...' : 'Timer innactive'}
+                </p>
+            </section>
+        </>
+    )
+}
+```
+
+In file of ResultModal.jsx 
+
+```javascript
+import { forwardRef } from "react";
+
+const ResultModal = forwardRef(function ResultModal({ result, targetTime }, ref) {
+    return (
+        <dialog ref={ref} className="result-modal">
+            <h2>You {result}</h2>
+            <p>
+                The target time was <strong>{targetTime} seconds.</strong>
+            </p>
+            <p>
+                You stopped the timer with <strong>X seconds left.</strong>
+            </p>
+            <form method="dialog">
+                <button>Close</button>
+            </form>
+        </dialog>
+    )
+});
+
+export default ResultModal;
+```
 </details>
