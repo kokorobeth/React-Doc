@@ -659,3 +659,92 @@ const ResultModal = forwardRef(function ResultModal({ result, targetTime }, ref)
 export default ResultModal;
 ```
 </details>
+
+<details>
+<summary>Exposing Component APIs via the useImperativeHandle Hook</summary>
+
+On ResultModal.jsx file we can add prop useImperativeHandle 
+
+```javascript
+import { forwardRef, useImperativeHandle, useRef } from "react";
+
+const ResultModal = forwardRef(function ResultModal({ result, targetTime }, ref) {
+    const dialog = useRef();
+
+    useImperativeHandle(ref, () => {
+        return {
+            open() {
+                dialog.current.showModal();
+            }
+        };
+    });
+
+    return (
+        <dialog ref={dialog} className="result-modal">
+            <h2>You {result}</h2>
+            <p>
+                The target time was <strong>{targetTime} seconds.</strong>
+            </p>
+            <p>
+                You stopped the timer with <strong>X seconds left.</strong>
+            </p>
+            <form method="dialog">
+                <button>Close</button>
+            </form>
+        </dialog>
+    )
+});
+
+export default ResultModal;
+```
+
+and also edit some codes on TimerChallenge.jsx file on a part of dialog.current.showModal() in handleStart function into dialog.current.open();
+
+```javascript
+import { useState, useRef } from "react";
+import ResultModal from "./ResultModal";
+
+// let timer;
+
+export default function TimerChallenge({ title, targetTime }) {
+    const timer = useRef();
+    const dialog = useRef();
+
+    const [timerStarted, setTimerStarted] = useState(false);
+    const [timerExpired, setTimerExpired] = useState(false);
+
+    function handleStart() {
+        timer.current = setTimeout(() => {
+            setTimerExpired(true);
+            dialog.current.open();
+        }, targetTime * 1000);
+
+        setTimerStarted(true);
+    }
+
+    function handleStop() {
+        clearTimeout(timer.current);
+    }
+    return (
+        <>
+            <ResultModal ref={dialog} targetTime={targetTime} result="lost" />
+            <section className="challenge">
+                <h2>{title}</h2>
+                <p className="challenge-time">
+                {targetTime} second{targetTime > 1 ? 's' : ''}
+                </p>
+                <p>
+                <button onClick={timerStarted ? handleStop : handleStart}>
+                {timerStarted ? 'Stop' : 'Start'} Challenge
+                </button>
+                </p>
+                <p className={timerStarted ? 'active' : undefined}>
+                {timerStarted? 'Time is running...' : 'Timer innactive'}
+                </p>
+            </section>
+        </>
+    )
+}
+```
+
+</details>
