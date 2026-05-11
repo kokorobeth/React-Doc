@@ -512,3 +512,72 @@ export default function TimerChallenge({ title, targetTime }) {
 ```
 
 </details>
+
+<details>
+<summary>Adding A Modal Component</summary>
+
+In this case we create a new component file with the name ResultModal.jsx
+
+```javascript
+export default function ResultModal({ result, targetTIme }) {
+    return (
+        <dialog className="result-modal">
+            <h2>You {result}</h2>
+            <p>The target time was <strong>{targetTIme} seconds.</strong></p>
+            <p>You stopped the timer with <strong>X seconds left.</strong></p>
+            <form method="dialog">
+                <button>Close</button>
+            </form>
+        </dialog>
+    )
+}
+```
+
+So on TimerChallenge.jsx file we need to wrap "<></>" the code, import ResultModal file and put <ResultModal on there.
+
+```javascript
+import { useState, useRef } from "react";
+import ResultModal from "./ResultModal";
+
+// let timer;
+
+export default function TimerChallenge({ title, targetTime }) {
+    const timer = useRef();
+
+    const [timerStarted, setTimerStarted] = useState(false);
+    const [timerExpired, setTimerExpired] = useState(false);
+
+    function handleStart() {
+        timer.current = setTimeout(() => {
+            setTimerExpired(true);
+        }, targetTime * 1000);
+
+        setTimerStarted(true);
+    }
+
+    function handleStop() {
+        clearTimeout(timer.current);
+    }
+    return (
+        <>
+            {timerExpired && <ResultModal targetTime={targetTime} result="lost" />}
+            <section className="challenge">
+                <h2>{title}</h2>
+                <p className="challenge-time">
+                {targetTime} second{targetTime > 1 ? 's' : ''}
+                </p>
+                <p>
+                <button onClick={timerStarted ? handleStop : handleStart}>
+                {timerStarted ? 'Stop' : 'Start'} Challenge
+                </button>
+                </p>
+                <p className={timerStarted ? 'active' : undefined}>
+                {timerStarted? 'Time is running...' : 'Timer innactive'}
+                </p>
+            </section>
+        </>
+    )
+}
+```
+
+</details>
