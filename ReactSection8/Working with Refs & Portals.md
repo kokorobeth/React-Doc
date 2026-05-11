@@ -581,3 +581,7 @@ export default function TimerChallenge({ title, targetTime }) {
 ```
 
 </details>
+
+<details>
+<summary>Forwarding Refs To Custom Components</summary>
+</details>
