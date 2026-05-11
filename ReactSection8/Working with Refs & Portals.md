@@ -420,5 +420,95 @@ So if we check on the browser, the display should be :
 <details>
 <summary>Using Refs for more than DOM Element Connections</summary>
 
+It's time to create function and handling the stop function by using handleStop function.
+
+Before, we could write the code like this :
+
+```javascript
+import { useState } from "react";
+
+let timer;
+
+export default function TimerChallenge({ title, targetTime }) {
+
+    const [timerStarted, setTimerStarted] = useState(false);
+    const [timerExpired, setTimerExpired] = useState(false);
+
+    function handleStart() {
+        timer = setTimeout(() => {
+            setTimerExpired(true);
+        }, targetTime * 1000);
+
+        setTimerStarted(true);
+    }
+
+    function handleStop() {
+        clearTimeout(timer);
+    }
+    return (
+        <section className="challenge">
+            <h2>{title}</h2>
+            {timerExpired && <p>You lost!</p>}
+            <p className="challenge-time">
+                {targetTime} second{targetTime > 1 ? 's' : ''}
+            </p>
+            <p>
+                <button onClick={timerStarted ? handleStop : handleStart}>
+                    {timerStarted ? 'Stop' : 'Start'} Challenge
+                </button>
+            </p>
+            <p className={timerStarted ? 'active' : undefined}>
+                {timerStarted? 'Time is running...' : 'Timer innactive'}
+            </p>
+        </section>
+    )
+}
+```
+
+But when we do the challege, for instance we do in 1 second challenge it works, but for 5 seconds we still get the loss notif. So the solution is using refs.
+
+And here is the updated code by using Ref
+
+```javascript
+import { useState, useRef } from "react";
+
+// let timer;
+
+export default function TimerChallenge({ title, targetTime }) {
+    const timer = useRef();
+
+    const [timerStarted, setTimerStarted] = useState(false);
+    const [timerExpired, setTimerExpired] = useState(false);
+
+    function handleStart() {
+        timer.current = setTimeout(() => {
+            setTimerExpired(true);
+        }, targetTime * 1000);
+
+        setTimerStarted(true);
+    }
+
+    function handleStop() {
+        clearTimeout(timer.current);
+    }
+    return (
+        <section className="challenge">
+            <h2>{title}</h2>
+            {timerExpired && <p>You lost!</p>}
+            <p className="challenge-time">
+                {targetTime} second{targetTime > 1 ? 's' : ''}
+            </p>
+            <p>
+                <button onClick={timerStarted ? handleStop : handleStart}>
+                    {timerStarted ? 'Stop' : 'Start'} Challenge
+                </button>
+            </p>
+            <p className={timerStarted ? 'active' : undefined}>
+                {timerStarted? 'Time is running...' : 'Timer innactive'}
+            </p>
+        </section>
+    )
+}
+```
 
 </details>
