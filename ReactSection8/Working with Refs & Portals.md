@@ -810,3 +810,113 @@ Note : It's important to remember that some codes above is mostly altered. We ad
 
 </details>
 
+<details>
+<summary>Sharing State accross Components</summary>
+
+In TimerChallenge.jsx file whould add the codes remainingTime={timeRemaining} in '<ResultModal', also adding a new function **handleReset** adding some props like onReset etc.
+
+So in ResultModal.jsx file we could adding props timeRemaining and edit the codes after return '(' in JSX codes and so on.
+
+```javascript
+import { useState, useRef } from "react";
+import ResultModal from "./ResultModal";
+
+// let timer;
+
+export default function TimerChallenge({ title, targetTime }) {
+    const timer = useRef();
+    const dialog = useRef();
+
+    const [timeRemaining, setTimeRemaining] = useState(targetTime * 1000);
+
+    const timerIsActive = timeRemaining > 0 && timeRemaining < targetTime * 1000;
+
+    if(timeRemaining <= 0) {
+        clearInterval(timer.current);
+        setTimeRemaining(targetTime * 1000);
+        dialog.current.open();
+    }
+
+    function handleReset() {
+        setTimeRemaining(targetTime * 1000);
+    }
+
+    function handleStart() {
+        timer.current = setInterval(() => {
+            setTimeRemaining(prevTimeRemaining => prevTimeRemaining - 10);
+        }, 10);
+    }
+
+    function handleStop() {
+        dialog.current.open();
+        clearInterval(timer.current);
+    }
+    return (
+        <>
+            <ResultModal 
+                ref={dialog} 
+                targetTime={targetTime} 
+                remainingTime={timeRemaining}
+                onReset={handleReset}
+            />
+            <section className="challenge">
+                <h2>{title}</h2>
+                <p className="challenge-time">
+                {targetTime} second{targetTime > 1 ? 's' : ''}
+                </p>
+                <p>
+                <button onClick={timerIsActive ? handleStop : handleStart}>
+                {timerIsActive ? 'Stop' : 'Start'} Challenge
+                </button>
+                </p>
+                <p className={timerIsActive ? 'active' : undefined}>
+                {timerIsActive ? 'Time is running...' : 'Timer innactive'}
+                </p>
+            </section>
+        </>
+    )
+}
+```
+
+```javascript
+import { forwardRef, useImperativeHandle, useRef } from "react";
+
+const ResultModal = forwardRef(function ResultModal(
+    { targetTime, remainingTime, onReset }, ref) {
+    const dialog = useRef();
+
+    const userLost = remainingTime <= 0;
+    const formattedRemainingTime = (remainingTime / 1000).toFixed(2);
+
+    useImperativeHandle(ref, () => {
+        return {
+            open() {
+                dialog.current.showModal();
+            }
+        };
+    });
+
+    return (
+        <dialog ref={dialog} className="result-modal">
+            {userLost && <h2>You lost</h2>}
+            <p>
+                The target time was <strong>{targetTime} seconds.</strong>
+            </p>
+            <p>
+                You stopped the timer with <strong>{formattedRemainingTime} seconds left.</strong>
+            </p>
+            <form method="dialog" onSubmit={onReset}>
+                <button>Close</button>
+            </form>
+        </dialog>
+    )
+});
+
+export default ResultModal;
+```
+
+Note : So when we open di browser and open the challenge in 1 second, there would be udpated the second left. 
+
+![alt text](image-2.png)
+</details>
+
