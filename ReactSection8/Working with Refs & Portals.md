@@ -751,5 +751,62 @@ export default function TimerChallenge({ title, targetTime }) {
 
 <details>
 <summary>More Examples : When to use Refs & State</summary>
+
+In file of TimerChanllenge.jsx we should alter setTimeout into SetInterval in handleStart() function. And theres some codes tobe eliminated.
+
+```javascript
+import { useState, useRef } from "react";
+import ResultModal from "./ResultModal";
+
+// let timer;
+
+export default function TimerChallenge({ title, targetTime }) {
+    const timer = useRef();
+    const dialog = useRef();
+
+    const [timeRemaining, setTimeRemaining] = useState(targetTime * 1000);
+
+    const timerIsActive = timeRemaining > 0 && timeRemaining < targetTime * 1000;
+
+    if(timeRemaining <= 0) {
+        clearInterval(timer.current);
+        setTimeRemaining(targetTime * 1000);
+        dialog.current.open();
+    }
+
+    function handleStart() {
+        timer.current = setInterval(() => {
+            setTimeRemaining(prevTimeRemaining => prevTimeRemaining - 10);
+        }, 10);
+    }
+
+    function handleStop() {
+        dialog.current.open();
+        clearInterval(timer.current);
+    }
+    return (
+        <>
+            <ResultModal ref={dialog} targetTime={targetTime} result="lost" />
+            <section className="challenge">
+                <h2>{title}</h2>
+                <p className="challenge-time">
+                {targetTime} second{targetTime > 1 ? 's' : ''}
+                </p>
+                <p>
+                <button onClick={timerIsActive ? handleStop : handleStart}>
+                {timerIsActive ? 'Stop' : 'Start'} Challenge
+                </button>
+                </p>
+                <p className={timerIsActive ? 'active' : undefined}>
+                {timerIsActive ? 'Time is running...' : 'Timer innactive'}
+                </p>
+            </section>
+        </>
+    )
+}
+```
+
+Note : It's important to remember that some codes above is mostly altered. We adding if check and dialog, So the different dialog in handleStop and in if check is, while in handleStop function the dialog is clicked manually. In if check the dialog will show automatically.
+
 </details>
 
