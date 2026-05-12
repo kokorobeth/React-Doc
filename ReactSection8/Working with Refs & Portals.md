@@ -972,11 +972,11 @@ So then when we click the button in any part of 1 second, 5 seconds the result o
 <details>
 <summary>Closing the Modal via the ESC (Escape) Key</summary>
 
-The **<dialog>** element allows website visitors to close the opened dialog by pressing the ESC (Escape) key on their keyboard.
+The **<dialog** element allows website visitors to close the opened dialog by pressing the ESC (Escape) key on their keyboard.
 
 Currently, this will not trigger the onReset function though (unlike closing the dialog with a button click).
 
-To make sure that **onReset** gets triggered when the dialog is closed via the escape key, you should add the built-in **onClose** prop to the <dialog> element and bind it to the onReset prop value.
+To make sure that **onReset** gets triggered when the dialog is closed via the escape key, you should add the built-in **onClose** prop to the **<dialog** element and bind it to the onReset prop value.
 
 Like this:
 
