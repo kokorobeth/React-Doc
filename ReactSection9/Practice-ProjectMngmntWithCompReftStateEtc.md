@@ -37,3 +37,50 @@ Run `npm audit` for details.
 ```
 
 </details>
+
+<details>
+<summary>Adding a "Projects Sidebar" Component</summary>
+
+In this section we would like to create folder called **components**. And create new file called *ProjectsSidebar.jsx* and the codes are :
+
+```javascript
+export default function ProjectsSidebar() {
+    return (
+        <aside>
+            <h2>Your Project</h2>
+            <div>
+                <button>
+                    + Add Project
+                </button>
+            </div>
+            <ul>
+
+            </ul>
+        </aside>
+    );
+}
+
+```
+
+Also in *App.jsx* file we can modify the codes into :
+
+```javascript
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+
+function App() {
+  return (
+    <main>
+      <ProjectsSidebar />
+    </main>
+  );
+}
+
+export default App;
+
+```
+
+When we run and see on the browser, the style is still plan. 
+
+And in the next lecture we are going to style it.
+
+</details>
