@@ -84,3 +84,48 @@ When we run and see on the browser, the style is still plan.
 And in the next lecture we are going to style it.
 
 </details>
+
+<details>
+<summary>Styling the Sidebar & Button with Talwind CSS</summary>
+
+In **App.jsx** and **ProjectsSidebar.jsx** file we add Talwind CSS
+
+```javascript
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+
+function App() {
+  return (
+    <main className="h-screen my-8 ">
+      <ProjectsSidebar />
+    </main>
+  );
+}
+
+export default App;
+
+```
+
+```javascript
+export default function ProjectsSidebar() {
+    return (
+        <aside className="w-1/3 px-8 py-16 bg-stone-900 text-stone-50 md:w-72 rounded-r-xl">
+            <h2 className="mb-8 font-bold uppercase md:text-xl text-stone-200">Your Project</h2>
+            <div>
+                <button className="px-4 py-2 text-xs md:text-base rounded-md bg-stone-700 text-stone-400 hover:bg-stone-600 hover:text-stone-100">
+                    + Add Project
+                </button>
+            </div>
+            <ul>
+
+            </ul>
+        </aside>
+    );
+}
+
+```
+
+So we run this **npm run dev**, we'll see the result is nicer than before
+
+![alt text](image.png)
+
+</details>
