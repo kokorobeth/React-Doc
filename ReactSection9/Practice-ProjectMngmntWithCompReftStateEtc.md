@@ -129,3 +129,97 @@ So we run this **npm run dev**, we'll see the result is nicer than before
 ![alt text](image.png)
 
 </details>
+
+<details>
+<summary>Adding the "New Project" Component & A Reusable "Input" Component</summary>
+
+Here we add or create new file called NewProject.jsx on a **components** folder
+
+Fore temporary code it seems to be like this :
+
+```javascript
+export default function NewProject() {
+    return (
+        <div>
+            <menu>
+                <li><button>Cancel</button></li>
+                <li><button>Save</button></li>
+            </menu>
+            <div>
+                <p>
+                    <label>Title</label>
+                    <input />
+                </p>
+                <p>
+                    <label>Description</label>
+                    <textarea />
+                </p>
+                <p>
+                    <label>Due Date</label>
+                    <input />
+                </p>
+            </div>
+        </div>
+    )
+}
+```
+
+Next we create also a new file called **Input.jsx** still on a *components* folder
+
+```javascript
+export default function Input({ label, textarea, ...props }) {
+    return (
+        <p>
+            <label>{label}</label>
+            {textarea ? <textarea {...props} /> : <input {...props} />}
+        </p>
+    );
+}
+```
+
+Then on **NewProject.jsx** file we can modify the code by adding the <Input sign there
+
+```javascript
+import Input from "./Input.jsx";
+
+export default function NewProject() {
+    return (
+        <div>
+            <menu>
+                <li><button>Cancel</button></li>
+                <li><button>Save</button></li>
+            </menu>
+            <div>
+                <Input label="Title" />
+                <Input label="Description" textarea />
+                <Input label="Due Date" />
+            </div>
+        </div>
+    );
+}
+```
+
+Also in **App.jsx** file we can add <New Project and then also adding a talwin css again. As we see below :
+
+```javascript
+import NewProject from "./components/NewProject.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+
+function App() {
+  return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar />
+      <NewProject />
+    </main>
+  );
+}
+
+export default App;
+
+```
+
+Then run the dev, we will see the result below :
+
+![alt text](image-1.png)
+
+</details>
