@@ -223,3 +223,76 @@ Then run the dev, we will see the result below :
 ![alt text](image-1.png)
 
 </details>
+
+<details>
+<summary>Styling Buttons & Inputs with Talwind CSS</summary>
+
+To improve our styling, now we'll go back to file of *NewProject.jsx* and then adding a talwind css to the codes
+
+```javascript
+import Input from "./Input.jsx";
+
+export default function NewProject() {
+    return (
+        <div className="w-[35rem] mt-16">
+            <menu className="flex items-center justify-end gap-4 my-4">
+                <li>
+                    <button className="text-stone-800 hover:text-stone-950">Cancel</button>
+                </li>
+                <li>
+                    <button className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950">Save</button>
+                </li>
+            </menu>
+            <div>
+                <Input label="Title" />
+                <Input label="Description" textarea />
+                <Input label="Due Date" />
+            </div>
+        </div>
+    );
+}
+```
+
+And the result will be displayed like this :
+
+![alt text](image-2.png)
+
+Next we also can add some talwin css code into *Input.jsx* file :
+
+```javascript
+export default function Input({ label, textarea, ...props }) {
+    return (
+        <p className="flex flex-col gap-1 my-4">
+            <label className="text-sm font-bold uppercase">{label}</label>
+            {textarea ? <textarea {...props} /> : <input {...props} />}
+        </p>
+    );
+}
+```
+
+And if we save this and the displayed result will be like this :
+
+![alt text](image-3.png)
+
+And actually we can make it cleaner for the codes on *Input.jsx* file to be :
+
+```javascript
+export default function Input({ label, textarea, ...props }) {
+    const classes = "w-full p-1 border-b-2 rounded-sm border-stone-300 bg-stone-200 text-stone-600 focus:outline-none focus:border-stone-600";
+    return (
+        <p className="flex flex-col gap-1 my-4">
+            <label className="text-sm font-bold uppercase">{label}</label>
+            {textarea ? (
+                <textarea className={classes} {...props} />
+             ) : ( <input className={classes} {...props} />
+            )}
+        </p>
+    );
+}
+```
+
+And the result to be :
+
+![alt text](image-4.png)
+
+</details>
