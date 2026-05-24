@@ -385,3 +385,137 @@ So the results on we should be like this :
 ![alt text](image-5.png)
 
 </details>
+
+<details>
+<summary>Managing State to Switch Between Components</summary>
+
+Here on *App.jsx* file, we should manage the state 
+
+```javascript
+import { useState } from "react";
+
+import NewProject from "./components/NewProject.jsx";
+import NoProjectSelected from "./components/NoProjectSelected.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+
+function App() {
+
+  const [projectState, setProjectState] = useState({
+    selectedProjectId: undefined,
+    projects: []
+  });
+
+  function handleStartAddProject() {
+    setProjectState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: null,
+      };
+    });
+  }
+
+  return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar onStartAddProject={handleStartAddProject} />
+      <NoProjectSelected onStartAddProject={handleStartAddProject} />
+    </main>
+  );
+}
+
+export default App;
+
+```
+
+The on **ProjectsSidebar.jsx** file we should add onClick of onStartAddProject like this :
+
+```javascript
+import Button from "./Button.jsx";
+
+export default function ProjectsSidebar({ onStartAddProject }) {
+    return (
+        <aside className="w-1/3 px-8 py-16 bg-stone-900 text-stone-50 md:w-72 rounded-r-xl">
+            <h2 className="mb-8 font-bold uppercase md:text-xl text-stone-200">Your Project</h2>
+            <div>
+                <Button onClick={onStartAddProject}>
+                    + Add Project
+                </Button>
+            </div>
+            <ul>
+
+            </ul>
+        </aside>
+    );
+}
+```
+
+also in **NoProjectSelected.jsx** file :
+
+```javascript
+import noProjectImg from '../assets/no-projects.png';
+import Button from './Button.jsx';
+
+export default function NoProjectSelected({ onStartAddProject }) {
+    return (
+        <div className="mt-24 text-center w-2/3">
+            <img 
+            src={noProjectImg} 
+            alt='An empty task list' 
+            className='w-16 h-16 object-contain mx-auto' />
+            <h2 className='text-xl font-bold text-stone-500 my-4'>No Project Selected</h2>
+            <p className='text-stone-400 mb-4'>Select a project or get started with a new one</p>
+            <p className='mt-8 '>
+                <Button onClick={onStartAddProject}>Create new project</Button>
+            </p>
+        </div>
+    );
+}
+```
+
+Then the *App.jsx* file we should modify again by adding variable of content and also there are codes to be updated in there :
+
+```javascript
+import { useState } from "react";
+
+import NewProject from "./components/NewProject.jsx";
+import NoProjectSelected from "./components/NoProjectSelected.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+
+function App() {
+
+  const [projectsState, setProjectState] = useState({
+    selectedProjectId: undefined,
+    projects: []
+  });
+
+  function handleStartAddProject() {
+    setProjectState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: null,
+      };
+    });
+  }
+
+  let content;
+
+  if(projectsState.selectedProjectId === null) {
+    content = <NewProject />
+  } else if(projectsState.selectedProjectId === undefined) {
+    content = <NoProjectSelected onStartAddProject={handleStartAddProject} />;
+  }
+
+  return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar onStartAddProject={handleStartAddProject} />
+      {content}
+    </main>
+  );
+}
+
+export default App;
+
+```
+
+Then when we open the Apps, both button + Add Project and Create New Project is go back to the same form for creating new project.
+
+</details>
