@@ -296,3 +296,87 @@ And the result to be :
 ![alt text](image-4.png)
 
 </details>
+
+<details>
+<summary>Splitting Components to Split JSX & Tailwind Styles (for higher Reusability)</summary>
+
+Here we create new file called **NoProjectSelected.jsx** on *components* folder
+
+```javascript
+import noProjectImg from '../assets/no-projects.png';
+
+export default function NoProjectSelected() {
+    return (
+        <div className="mt-24 text-center w-2/3">
+            <img 
+            src={noProjectImg} 
+            alt='An empty task list' 
+            className='w-16 h-16 object-contain mx-auto' />
+            <h2 className='text-xl font-bold text-stone-500 my-4'>No Project Selected</h2>
+            <p className='text-stone-400 mb-4'>Select a project or get started with a new one</p>
+            <p className='mt-8 '>
+                <Button>Create new project</Button>
+            </p>
+        </div>
+    );
+}
+```
+
+On file above there's a tag **Button**, it derives from creating new file again called *Button.jsx* file :
+
+```javascript
+export default function Button({ children, ...props }) {
+    return (
+        <button className="px-4 py-2 text-xs md:text-base rounded-md bg-stone-700 text-stone-400 hover:bg-stone-600 hover:text-stone-100" {...props}>
+            {children}
+        </button>
+    );
+}
+```
+
+Note : On file of **Button.jsx**, the code of button is cut from *ProjectSidebar.jsx* and the on file of *ProjectSidebar.jsx* we only import *Button.jsx* file :
+
+```javascript
+import Button from "./Button.jsx";
+
+export default function ProjectsSidebar() {
+    return (
+        <aside className="w-1/3 px-8 py-16 bg-stone-900 text-stone-50 md:w-72 rounded-r-xl">
+            <h2 className="mb-8 font-bold uppercase md:text-xl text-stone-200">Your Project</h2>
+            <div>
+                <Button>
+                    + Add Project
+                </Button>
+            </div>
+            <ul>
+
+            </ul>
+        </aside>
+    );
+}
+
+```
+
+And the last, we should also change the code or midify on **App.jsx** file into :
+
+```javascript
+import NewProject from "./components/NewProject.jsx";
+import NoProjectSelected from "./components/NoProjectSelected.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+
+function App() {
+  return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar />
+      <NoProjectSelected />
+    </main>
+  );
+}
+
+export default App;
+
+```
+
+Note : The tag of NoProjectSelected replace the previous tag.
+
+</details>
