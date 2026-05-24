@@ -304,6 +304,7 @@ Here we create new file called **NoProjectSelected.jsx** on *components* folder
 
 ```javascript
 import noProjectImg from '../assets/no-projects.png';
+import Button from './Button.jsx';
 
 export default function NoProjectSelected() {
     return (
