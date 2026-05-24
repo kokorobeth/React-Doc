@@ -519,3 +519,182 @@ export default App;
 Then when we open the Apps, both button + Add Project and Create New Project is go back to the same form for creating new project.
 
 </details>
+
+<details>
+<summary>Collecting User Input with Refs & Forwarded Refs</summary>
+
+First we want to add refs on **NewProject.jsx** and **Input.jsx** file, both files are using ref and modify some codes using refs also which ref={ref} in is taken from the parameter and import the forwarded ref.
+
+```javascript
+import { forwardRef } from "react";
+
+const Input = forwardRef (function Input({ label, textarea, ...props }, ref) {
+    const classes = "w-full p-1 border-b-2 rounded-sm border-stone-300 bg-stone-200 text-stone-600 focus:outline-none focus:border-stone-600";
+    return (
+        <p className="flex flex-col gap-1 my-4">
+            <label className="text-sm font-bold uppercase">{label}</label>
+            {textarea ? (
+                <textarea ref={ref} className={classes} {...props} />
+             ) : ( 
+                <input ref={ref} className={classes} {...props} />
+            )}
+        </p>
+    );
+});
+
+export default Input;
+```
+
+```javascript
+import { useRef } from 'react';
+import Input from "./Input.jsx";
+
+export default function NewProject() {
+    const title = useRef();
+    const description = useRef();
+    const dueDate = useRef();
+
+    function handleSave() {
+        const enteredTitle = title.current.value;
+        const enteredDescription = description.current.value;
+        const enteredDueDate = dueDate.current.value;
+
+        // validation ....
+        
+    }
+
+    return (
+        <div className="w-[35rem] mt-16">
+            <menu className="flex items-center justify-end gap-4 my-4">
+                <li>
+                    <button className="text-stone-800 hover:text-stone-950">
+                        Cancel
+                    </button>
+                </li>
+                <li>
+                    <button className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950"
+                    onClick={handleSave}>
+                        Save
+                    </button>
+                </li>
+            </menu>
+            <div>
+                <Input ref={title} label="Title" />
+                <Input ref={description} label="Description" textarea />
+                <Input ref={dueDate} label="Due Date" />
+            </div>
+        </div>
+    );
+}
+```
+
+So in **App.jsx** we need to add a function named handleAddProject() and needed to call setProjectsState again etc.
+
+```javascript
+import { useState } from "react";
+
+import NewProject from "./components/NewProject.jsx";
+import NoProjectSelected from "./components/NoProjectSelected.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+
+function App() {
+
+  const [projectsState, setProjectsState] = useState({
+    selectedProjectId: undefined,
+    projects: []
+  });
+
+  function handleStartAddProject() {
+    setProjectState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: null,
+      };
+    });
+  }
+
+  function handleAddProject(projectData) {
+    setProjectsState(prevState => {
+      const newProject = {
+        ...projectData,
+        id: Math.random()
+      };
+
+      return {
+        ...prevState,
+        projects: [...prevState.projects, newProject]
+      };
+    });
+  }
+
+  console.log(projectsState);
+
+  let content;
+
+  if(projectsState.selectedProjectId === null) {
+    content = <NewProject onAdd={handleAddProject} />
+  } else if(projectsState.selectedProjectId === undefined) {
+    content = <NoProjectSelected onStartAddProject={handleStartAddProject} />;
+  }
+
+  return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar onStartAddProject={handleStartAddProject} />
+      {content}
+    </main>
+  );
+}
+
+export default App;
+```
+
+So in **NewProject.jsx** we can do the codes for the validation etc :
+
+```javascript
+import { useRef } from 'react';
+import Input from "./Input.jsx";
+
+export default function NewProject({onAdd}) {
+    const title = useRef();
+    const description = useRef();
+    const dueDate = useRef();
+
+    function handleSave() {
+        const enteredTitle = title.current.value;
+        const enteredDescription = description.current.value;
+        const enteredDueDate = dueDate.current.value;
+
+        // validation ....
+
+        onAdd({
+            title: enteredTitle,
+            description: enteredDescription,
+            dueDate: enteredDueDate
+        });
+    }
+
+    return (
+        <div className="w-[35rem] mt-16">
+            <menu className="flex items-center justify-end gap-4 my-4">
+                <li>
+                    <button className="text-stone-800 hover:text-stone-950">
+                        Cancel
+                    </button>
+                </li>
+                <li>
+                    <button className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950"
+                    onClick={handleSave}>
+                        Save
+                    </button>
+                </li>
+            </menu>
+            <div>
+                <Input type="text" ref={title} label="Title" />
+                <Input ref={description} label="Description" textarea />
+                <Input type="date" ref={dueDate} label="Due Date" />
+            </div>
+        </div>
+    );
+}
+```
+</details>
