@@ -605,7 +605,7 @@ function App() {
   });
 
   function handleStartAddProject() {
-    setProjectState(prevState => {
+    setProjectsState(prevState => {
       return {
         ...prevState,
         selectedProjectId: null,
