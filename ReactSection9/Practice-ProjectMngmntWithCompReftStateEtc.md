@@ -698,3 +698,102 @@ export default function NewProject({onAdd}) {
 }
 ```
 </details>
+
+<details>
+<summary>Handling Project Creation & Updating the UI</summary>
+
+We come back to *App.jsx* file, we add selectedProjectId: undifined in handleAddProject function, to make the form when we save it will go back to previous button for creating new project. Or making a constant projectId = Math.random(). And also adding projects={projectsState.projects} in tag of <ProjectsSidebar. 
+
+```javascript
+import { useState } from "react";
+
+import NewProject from "./components/NewProject.jsx";
+import NoProjectSelected from "./components/NoProjectSelected.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+
+function App() {
+
+  const [projectsState, setProjectsState] = useState({
+    selectedProjectId: undefined,
+    projects: []
+  });
+
+  function handleStartAddProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: null,
+      };
+    });
+  }
+
+  function handleAddProject(projectData) {
+    setProjectsState(prevState => {
+      const projectId = Math.random()
+      const newProject = {
+        ...projectData,
+        id: projectId
+      };
+
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+        projects: [...prevState.projects, newProject],
+      };
+    });
+  }
+
+  let content;
+
+  if(projectsState.selectedProjectId === null) {
+    content = <NewProject onAdd={handleAddProject} />;
+  } else if(projectsState.selectedProjectId === undefined) {
+    content = <NoProjectSelected onStartAddProject={handleStartAddProject} />;
+  }
+
+  return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar 
+        onStartAddProject={handleStartAddProject} 
+        projects={projectsState.projects} 
+      />
+      {content}
+    </main>
+  );
+}
+
+export default App;
+```
+
+Now we can go to *ProjectsSidebar.jsx* file, and adding props of projects into the function.
+
+Also adding on <li tag some codes. And Tailwind CSS
+
+```javascript
+import Button from "./Button.jsx";
+
+export default function ProjectsSidebar({ onStartAddProject, projects }) {
+    return (
+        <aside className="w-1/3 px-8 py-16 bg-stone-900 text-stone-50 md:w-72 rounded-r-xl">
+            <h2 className="mb-8 font-bold uppercase md:text-xl text-stone-200">Your Project</h2>
+            <div>
+                <Button onClick={onStartAddProject}>
+                    + Add Project
+                </Button>
+            </div>
+            <ul className="mt-8">
+                {projects.map(project => <li key={project.id}>
+                    <button className="w-full text-left px-2 py-1 rounded-sm my-1 text-stone-400 hover:text-stone-200 hover:bg-stone-800">{project.title}</button>
+                </li>)}
+            </ul>
+        </aside>
+    );
+}
+
+
+```
+
+We run this, and fill the form in there, the project will be shown on the list :
+
+![alt text](image-6.png)
+</details>
