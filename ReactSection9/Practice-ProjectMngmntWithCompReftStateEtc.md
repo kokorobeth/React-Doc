@@ -803,5 +803,78 @@ We run this, and fill the form in there, the project will be shown on the list :
 
 To show the error if we save the new project, we can go first into *NewProject.jsx* file by describing the validating codes in handleSave function.
 
+```javascript
+    function handleSave() {
+        const enteredTitle = title.current.value;
+        const enteredDescription = description.current.value;
+        const enteredDueDate = dueDate.current.value;
+
+        if(
+            enteredTitle.trim() === '' || 
+            enteredDescription.trim() === '' || 
+            enteredDueDate.trim() === ''
+        ) {
+            //show the error modal
+        }
+```
+
+Beside that, we can create new File named *Modal.jsx*, and importing createPortal from 'react-dom', importing forwardRef, useImperativeHandle from react. In file of *index.html* also we can see  modal-root reffering to Modal.jsx file.
+```html
+<div id="modal-root"></div>
+```
+
+Here is the *Modal.jsx* file :
+
+```javascript
+import { forwardRef, useImperativeHandle } from "react";
+import { createPortal } from "react-dom";
+
+const Modal = forwardRef(function Modal({ children }, ref) {
+    const dialog = useRef();
+
+    useImperativeHandle(ref, () => {
+        return {
+            open() {
+                dialog.current.showModal();
+            }
+        };
+    });
+
+    return createPortal(
+        <dialog ref={dialog}>{children}</dialog>, 
+        document.getElementById('modal-root')
+    );
+});
+
+export default Modal;
+```
+
+In *NewProject.jsx* file, after return code we can add <></> and import './Modal.jsx' and also const modal then fill the ref in Modal like this :
+
+```javascript
+return (
+        <>
+        <Modal ref={modal}>
+            <h2>Invalid Input</h2>
+            <p>Oops ... looks like your forgot to enter a value.</p>
+            <p>Please make sure you provide a valid value for every input field.</p>
+        </Modal>
+```
+
+And in file of *Modal.jsx* we can add form tag after return createPortal and also add buttonCaption props 
+
+```javascript
+    const Modal = forwardRef(function Modal({ children, buttonCaption }, ref) {
+
+    return createPortal(
+        <dialog ref={dialog} buttonCaption="Okay">
+            {children}
+            <form method="dialog">
+                <button>{buttonCaption}</button>
+            </form>
+        </dialog>, 
+        document.getElementById('modal-root')
+    );
+```
 
 </details>
