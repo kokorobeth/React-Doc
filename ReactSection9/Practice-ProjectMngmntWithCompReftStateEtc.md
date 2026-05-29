@@ -797,3 +797,11 @@ We run this, and fill the form in there, the project will be shown on the list :
 
 ![alt text](image-6.png)
 </details>
+
+<details>
+<summary>Validating User Input & Showing an Error Modal via useImperativeHandle</summary>
+
+To show the error if we save the new project, we can go first into *NewProject.jsx* file by describing the validating codes in handleSave function.
+
+
+</details>
