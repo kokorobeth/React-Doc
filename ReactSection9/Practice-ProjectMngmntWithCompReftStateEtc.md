@@ -988,3 +988,306 @@ Looks like not pretty enough for the dialog error, but for this step we could ca
 We'll fix the error dialog for the css in the next lecture. !!!!
 
 </details>
+
+<details>
+<summary>Styling the Modal via Tailwind CSS</summary>
+
+First we wan't to add style on *Modal.jsx* file especial in part of return createPortal
+
+```javascript
+return createPortal(
+        <dialog ref={dialog} className="backdrop:bg-stone-900/90 p-4 rounded-md shadow-md">
+            {children}
+            <form method="dialog">
+                <button>{buttonCaption}</button>
+            </form>
+        </dialog>, 
+        document.getElementById('modal-root')
+    );
+```
+
+And also we could add tailwind css on *NewProject.jsx* file in part of Modal tag
+
+```javascript
+return (
+        <>
+        <Modal ref={modal} buttonCaption="Okay">
+            <h2 className='text-xl font-bold text-stone-500 my-4'>Invalid Input</h2>
+            <p className='text-stone-400 mb-4'>
+                Oops ... looks like your forgot to enter a value.
+            </p>
+            <p className='text-stone-400 mb-4'>
+                Please make sure you provide a valid value for every input field.
+            </p>
+        </Modal>
+```
+
+So if we save this and seeing on the browser, it looks much better
+
+![alt text](image-8.png)
+
+And back to *Modal.jsx* file, we can add style to a form tag, and also button tag below be changed to existing button with Button tag. like this :
+
+```javascript
+return createPortal(
+        <dialog ref={dialog} className="backdrop:bg-stone-900/90 p-4 rounded-md shadow-md">
+            {children}
+            <form method="dialog" className="mt-4 text-right">
+                <Button>{buttonCaption}</Button>
+            </form>
+        </dialog>, 
+        document.getElementById('modal-root')
+    );
+```
+
+And the result looks nicer than before :
+
+![alt text](image-9.png)
+
+Go back to *NewProject.jsx* file, we can also make darker for the description of h2 and p tags. Which updated to 700, while p tags updated to 600.
+
+```javascript
+    return (
+        <>
+        <Modal ref={modal} buttonCaption="Okay">
+            <h2 className='text-xl font-bold text-stone-700 my-4'>Invalid Input</h2>
+            <p className='text-stone-600 mb-4'>
+                Oops ... looks like your forgot to enter a value.
+            </p>
+            <p className='text-stone-600 mb-4'>
+                Please make sure you provide a valid value for every input field.
+            </p>
+        </Modal>
+```
+
+Next we'll try to code for handleCancel button, which *App.jsx* should be added for it's code. Also configure it on if state below
+
+```javascript
+function handleCancelAddProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+      };
+    });
+  }
+```
+
+Also adding again code onCancel={} in if state below let content codes in *App.jsx* file.
+
+```javascript
+let content;
+
+  if(projectsState.selectedProjectId === null) {
+    content = (
+      <NewProject onAdd={handleAddProject} onCancel={handleCancelAddProject} />
+    );
+  } else if(projectsState.selectedProjectId === undefined) {
+    content = <NoProjectSelected onStartAddProject={handleStartAddProject} />;
+  }
+```
+
+Back to *NewProject.jsx* file, we can add props on it function like this :
+
+```javascript
+export default function NewProject({onAdd, onCancel})
+```
+
+Also adding on button part
+
+```javascript
+    <button 
+        className="text-stone-800 hover:text-stone-950" 
+        onClick={onCancel}
+        >
+            Cancel
+    </button>
+```
+
+Here are the files updated after modified :
+
+**NewProject.jsx**
+
+```javascript
+import { useRef } from 'react';
+
+import Input from "./Input.jsx";
+import Modal from './Modal.jsx';
+
+
+export default function NewProject({onAdd, onCancel}) {
+    const modal = useRef();
+
+    const title = useRef();
+    const description = useRef();
+    const dueDate = useRef();
+
+    function handleSave() {
+        const enteredTitle = title.current.value;
+        const enteredDescription = description.current.value;
+        const enteredDueDate = dueDate.current.value;
+
+        if(
+            enteredTitle.trim() === '' || 
+            enteredDescription.trim() === '' || 
+            enteredDueDate.trim() === ''
+        ) {
+            modal.current.open();
+            return;
+        }
+
+        onAdd({
+            title: enteredTitle,
+            description: enteredDescription,
+            dueDate: enteredDueDate
+        });
+    }
+
+    return (
+        <>
+        <Modal ref={modal} buttonCaption="Okay">
+            <h2 className='text-xl font-bold text-stone-700 my-4'>Invalid Input</h2>
+            <p className='text-stone-600 mb-4'>
+                Oops ... looks like your forgot to enter a value.
+            </p>
+            <p className='text-stone-600 mb-4'>
+                Please make sure you provide a valid value for every input field.
+            </p>
+        </Modal>
+        <div className="w-[35rem] mt-16">
+            <menu className="flex items-center justify-end gap-4 my-4">
+                <li>
+                    <button 
+                        className="text-stone-800 hover:text-stone-950" 
+                        onClick={onCancel}
+                    >
+                        Cancel
+                    </button>
+                </li>
+                <li>
+                    <button className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950"
+                    onClick={handleSave}>
+                        Save
+                    </button>
+                </li>
+            </menu>
+            <div>
+                <Input type="text" ref={title} label="Title" />
+                <Input ref={description} label="Description" textarea />
+                <Input type="date" ref={dueDate} label="Due Date" />
+            </div>
+        </div>
+        </>  
+    );
+}
+```
+
+**Modal.jsx**
+
+```javascript
+import { forwardRef, useImperativeHandle, useRef } from "react";
+import { createPortal } from "react-dom";
+import Button from "./Button.jsx";
+
+const Modal = forwardRef(function Modal({ children, buttonCaption }, ref) {
+    const dialog = useRef();
+
+    useImperativeHandle(ref, () => {
+        return {
+            open() {
+                dialog.current.showModal();
+            }
+        };
+    });
+
+    return createPortal(
+        <dialog ref={dialog} className="backdrop:bg-stone-900/90 p-4 rounded-md shadow-md">
+            {children}
+            <form method="dialog" className="mt-4 text-right">
+                <Button>{buttonCaption}</Button>
+            </form>
+        </dialog>, 
+        document.getElementById('modal-root')
+    );
+});
+
+export default Modal;
+```
+
+**App.jsx**
+
+```javascript
+import { useState } from "react";
+
+import NewProject from "./components/NewProject.jsx";
+import NoProjectSelected from "./components/NoProjectSelected.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+
+function App() {
+
+  const [projectsState, setProjectsState] = useState({
+    selectedProjectId: undefined,
+    projects: []
+  });
+
+  function handleStartAddProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: null,
+      };
+    });
+  }
+
+  function handleCancelAddProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+      };
+    });
+  }
+
+  function handleAddProject(projectData) {
+    setProjectsState(prevState => {
+      const projectId = Math.random()
+      const newProject = {
+        ...projectData,
+        id: projectId
+      };
+
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+        projects: [...prevState.projects, newProject],
+      };
+    });
+  }
+
+  let content;
+
+  if(projectsState.selectedProjectId === null) {
+    content = (
+      <NewProject onAdd={handleAddProject} onCancel={handleCancelAddProject} />
+    );
+  } else if(projectsState.selectedProjectId === undefined) {
+    content = <NoProjectSelected onStartAddProject={handleStartAddProject} />;
+  }
+
+  return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar 
+        onStartAddProject={handleStartAddProject} 
+        projects={projectsState.projects} 
+      />
+      {content}
+    </main>
+  );
+}
+
+export default App;
+```
+
+So if we save this, and show on the browser, when we add new project but we want to cancel it by clicking the cancel button, it will back to page of Add new project.
+
+</details>
