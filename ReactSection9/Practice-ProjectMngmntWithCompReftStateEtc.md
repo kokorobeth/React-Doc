@@ -861,7 +861,7 @@ return (
         </Modal>
 ```
 
-And in file of *Modal.jsx* we can add form tag after return createPortal and also add buttonCaption props 
+And in file of *Modal.jsx* we can add form tag after return createPortal and also add buttonCaption props and import also useRef
 
 ```javascript
     const Modal = forwardRef(function Modal({ children, buttonCaption }, ref) {
@@ -876,5 +876,115 @@ And in file of *Modal.jsx* we can add form tag after return createPortal and als
         document.getElementById('modal-root')
     );
 ```
+
+Here are the codes of each classes after modified
+
+**NewProject.jsx** :
+
+```javascript
+import { useRef } from 'react';
+
+import Input from "./Input.jsx";
+import Modal from './Modal.jsx';
+
+
+export default function NewProject({onAdd}) {
+    const modal = useRef();
+
+    const title = useRef();
+    const description = useRef();
+    const dueDate = useRef();
+
+    function handleSave() {
+        const enteredTitle = title.current.value;
+        const enteredDescription = description.current.value;
+        const enteredDueDate = dueDate.current.value;
+
+        if(
+            enteredTitle.trim() === '' || 
+            enteredDescription.trim() === '' || 
+            enteredDueDate.trim() === ''
+        ) {
+            modal.current.open();
+            return;
+        }
+
+        onAdd({
+            title: enteredTitle,
+            description: enteredDescription,
+            dueDate: enteredDueDate
+        });
+    }
+
+    return (
+        <>
+        <Modal ref={modal} buttonCaption="Okay">
+            <h2>Invalid Input</h2>
+            <p>Oops ... looks like your forgot to enter a value.</p>
+            <p>Please make sure you provide a valid value for every input field.</p>
+        </Modal>
+        <div className="w-[35rem] mt-16">
+            <menu className="flex items-center justify-end gap-4 my-4">
+                <li>
+                    <button className="text-stone-800 hover:text-stone-950">
+                        Cancel
+                    </button>
+                </li>
+                <li>
+                    <button className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950"
+                    onClick={handleSave}>
+                        Save
+                    </button>
+                </li>
+            </menu>
+            <div>
+                <Input type="text" ref={title} label="Title" />
+                <Input ref={description} label="Description" textarea />
+                <Input type="date" ref={dueDate} label="Due Date" />
+            </div>
+        </div>
+        </>  
+    );
+}
+```
+
+**Modal.jsx** :
+
+```javascript
+import { forwardRef, useImperativeHandle, useRef } from "react";
+import { createPortal } from "react-dom";
+
+const Modal = forwardRef(function Modal({ children, buttonCaption }, ref) {
+    const dialog = useRef();
+
+    useImperativeHandle(ref, () => {
+        return {
+            open() {
+                dialog.current.showModal();
+            }
+        };
+    });
+
+    return createPortal(
+        <dialog ref={dialog}>
+            {children}
+            <form method="dialog">
+                <button>{buttonCaption}</button>
+            </form>
+        </dialog>, 
+        document.getElementById('modal-root')
+    );
+});
+
+export default Modal;
+```
+
+So, when we run the web, if we save the button while the field is still empty, it will show you the error dialog like this :
+
+![alt text](image-7.png)
+
+Looks like not pretty enough for the dialog error, but for this step we could catch the error.
+
+We'll fix the error dialog for the css in the next lecture. !!!!
 
 </details>
