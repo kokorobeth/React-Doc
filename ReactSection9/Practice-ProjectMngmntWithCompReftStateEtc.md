@@ -1291,3 +1291,132 @@ export default App;
 So if we save this, and show on the browser, when we add new project but we want to cancel it by clicking the cancel button, it will back to page of Add new project.
 
 </details>
+
+<details>
+<summary>Making Projects Selectable & Viewing Project</summary>
+
+To make selectedProject we need to create new component file named *SelectedProject.jsx* 
+
+```javascript
+export default function SelectedProject() {
+    return <div>
+        <header>
+            <div>
+                <h1>TITLE</h1>
+                <button>Delete</button>
+            </div>
+            <p>DATA</p>
+            <p>DESCRIPTION</p>
+        </header>
+        TASK
+    </div>
+}
+```
+
+But here for advanced, we need to add the props etc to this *SelectedProject.jsx* component file, also here we add talwind css styles.
+
+```javascript
+export default function SelectedProject({ project }) {
+
+    const formattedDate = new Date(project.dueDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+
+    return (
+        <div className="w-[35rem] mt-16">
+        <header className="pb-4 mb-4 border-b-2 border-stone-300">
+            <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold text-stone-600 mb-2">
+                    {project.title}
+                </h1>
+                <button className="text-stone-600 hover:text-stone-950 ">
+                    Delete
+                </button>
+            </div>
+            <p className="mb-4 text-stone-400">{formattedDate}</p>
+            <p className="text-stone-600 whitespace-pre-wrap">{project.description}</p>
+        </header>
+        TASK
+        </div>
+    );
+}
+```
+
+Open di file of *App.jsx* and we'll add new function named **handleSelectProject** 
+
+```javascript
+function App() {
+
+  const [projectsState, setProjectsState] = useState({
+    selectedProjectId: undefined,
+    projects: []
+  });
+
+  function handleSelectProject(id) {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: id,
+      };
+    });
+  }
+```
+
+Also adding it on return of ProjectsSidebar tag
+
+```javascript
+return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar 
+        onStartAddProject={handleStartAddProject} 
+        projects={projectsState.projects} 
+        onSelectProject={handleSelectProject}
+      />
+```
+
+In *ProjectsSidebar.jsx* we can add props *onSelectProject*, and *selectedProjectId* and also adding after it's button
+
+```javascript
+import Button from "./Button.jsx";
+
+export default function ProjectsSidebar({ 
+    onStartAddProject,
+    projects,
+    onSelectProject,
+    selectedProjectId
+    }) {
+    return (
+        <aside className="w-1/3 px-8 py-16 bg-stone-900 text-stone-50 md:w-72 rounded-r-xl">
+            <h2 className="mb-8 font-bold uppercase md:text-xl text-stone-200">Your Project</h2>
+            <div>
+                <Button onClick={onStartAddProject}>
+                    + Add Project
+                </Button>
+            </div>
+            <ul className="mt-8">
+                {projects.map(project => {
+                    let cssClasses = "w-full text-left px-2 py-1 rounded-sm my-1 text-stone-400 hover:text-stone-200 hover:bg-stone-800";
+
+                    return (
+                        <li key={project.id}>
+                        <button className=
+                        onClick={onSelectProject}
+                        >
+                            {project.title}
+                        </button>
+                        </li>
+                        );
+                        })} 
+            </ul>
+        </aside>
+    );
+}
+
+```
+
+
+
+
+</details>
