@@ -1376,7 +1376,7 @@ return (
       />
 ```
 
-In *ProjectsSidebar.jsx* we can add props *onSelectProject*, and *selectedProjectId* and also adding after it's button
+In *ProjectsSidebar.jsx* we can add props *onSelectProject*, and *selectedProjectId* and also adding after it's button etc.
 
 ```javascript
 import Button from "./Button.jsx";
@@ -1397,11 +1397,16 @@ export default function ProjectsSidebar({
             </div>
             <ul className="mt-8">
                 {projects.map(project => {
-                    let cssClasses = "w-full text-left px-2 py-1 rounded-sm my-1 text-stone-400 hover:text-stone-200 hover:bg-stone-800";
+                    let cssClasses = "w-full text-left px-2 py-1 rounded-sm my-1 hover:text-stone-200 hover:bg-stone-800";
 
+                    if(project.id === selectedProjectId) {
+                        cssClasses += ' bg-stone-800 text-stone-200'
+                    } else {
+                        cssClasses += ' text-stone-400'
+                    }
                     return (
                         <li key={project.id}>
-                        <button className=
+                        <button className={cssClasses}
                         onClick={onSelectProject}
                         >
                             {project.title}
@@ -1415,8 +1420,164 @@ export default function ProjectsSidebar({
 }
 
 ```
+And here in *App.jsx* file component, we modify the codes, import selectedProject etc.
 
+```javascript
+import { useState } from "react";
 
+import NewProject from "./components/NewProject.jsx";
+import NoProjectSelected from "./components/NoProjectSelected.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+import SelectedProject from './components/SelectedProject';
 
+function App() {
+
+  const [projectsState, setProjectsState] = useState({
+    selectedProjectId: undefined,
+    projects: []
+  });
+
+  function handleSelectProject(id) {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: id,
+      };
+    });
+  }
+
+  function handleStartAddProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: null,
+      };
+    });
+  }
+
+  function handleCancelAddProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+      };
+    });
+  }
+
+  function handleAddProject(projectData) {
+    setProjectsState(prevState => {
+      const projectId = Math.random()
+      const newProject = {
+        ...projectData,
+        id: projectId
+      };
+
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+        projects: [...prevState.projects, newProject],
+      };
+    });
+  }
+
+  const selectedProject = projectsState.projects.find(project => project.id === projectsState.selectedProjectId);
+
+  let content = <SelectedProject project={selectedProject} />;
+
+  if(projectsState.selectedProjectId === null) {
+    content = (
+      <NewProject onAdd={handleAddProject} onCancel={handleCancelAddProject} />
+    );
+  } else if(projectsState.selectedProjectId === undefined) {
+    content = <NoProjectSelected onStartAddProject={handleStartAddProject} />;
+  }
+
+  return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar 
+        onStartAddProject={handleStartAddProject} 
+        projects={projectsState.projects} 
+        onSelectProject={handleSelectProject}
+      />
+      {content}
+    </main>
+  );
+}
+
+export default App;
+```
+If we save this and run the browser *npm run dev*, It's still getting error or not displayed after we fill the form in creating project. The solution is changing part of code in *ProjectsSidebar.jsx* in onClick become **onClick={() => onSelectProject(project.id)}**
+
+```javascript
+<ul className="mt-8">
+                {projects.map(project => {
+                    let cssClasses = "w-full text-left px-2 py-1 rounded-sm my-1 hover:text-stone-200 hover:bg-stone-800";
+
+                    if(project.id === selectedProjectId) {
+                        cssClasses += ' bg-stone-800 text-stone-200'
+                    } else {
+                        cssClasses += ' text-stone-400'
+                    }
+                    return (
+                        <li key={project.id}>
+                        <button className={cssClasses}
+                        onClick={() => onSelectProject(project.id)}
+                        >
+                            {project.title}
+                        </button>
+                        </li>
+                        );
+                        })} 
+            </ul>
+```
+
+And the full codes of *ProjectsSidebar.jsx* are :
+
+```javascript
+import Button from "./Button.jsx";
+
+export default function ProjectsSidebar({ 
+    onStartAddProject,
+    projects,
+    onSelectProject,
+    selectedProjectId
+    }) {
+    return (
+        <aside className="w-1/3 px-8 py-16 bg-stone-900 text-stone-50 md:w-72 rounded-r-xl">
+            <h2 className="mb-8 font-bold uppercase md:text-xl text-stone-200">Your Project</h2>
+            <div>
+                <Button onClick={onStartAddProject}>
+                    + Add Project
+                </Button>
+            </div>
+            <ul className="mt-8">
+                {projects.map(project => {
+                    let cssClasses = "w-full text-left px-2 py-1 rounded-sm my-1 hover:text-stone-200 hover:bg-stone-800";
+
+                    if(project.id === selectedProjectId) {
+                        cssClasses += ' bg-stone-800 text-stone-200'
+                    } else {
+                        cssClasses += ' text-stone-400'
+                    }
+                    return (
+                        <li key={project.id}>
+                        <button className={cssClasses}
+                        onClick={() => onSelectProject(project.id)}
+                        >
+                            {project.title}
+                        </button>
+                        </li>
+                        );
+                        })} 
+            </ul>
+        </aside>
+    );
+}
+
+```
+
+Here is the result after the codes being changed :
+
+![alt text](image-10.png)
 
 </details>
