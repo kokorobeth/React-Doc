@@ -1760,3 +1760,75 @@ If we save this and open the browser, we now can add the project and we can dele
 
 
 </details>
+
+<details>
+<summary>Adding "Project Tasks" and A Tasks Component</summary>
+
+First we create new component file named **Task.jsx** file
+
+```javascript
+export default function Tasks() {
+    return <section>
+        <h2 className="text-2xl font-bold text-stone-700 mb-4">Tasks</h2>
+        NEWE TASK
+        <p className="text-stone-800 mb-4">
+            This project does not have any task yet.
+        </p>
+        <ul>
+
+        </ul>
+    </section>
+}
+```
+
+And in *SelectedProject.jsx* we can put Tasks tag class below tag of header. And make sure to import the class of Tasks.jsx in this class.
+
+```javascript
+            <p className="mb-4 text-stone-400">{formattedDate}</p>
+            <p className="text-stone-600 whitespace-pre-wrap">{project.description}</p>
+        </header>
+        <Tasks />
+        </div>
+```
+
+If we save this and open the browser, we'll find the text of TASK like captured below :
+
+![alt text](image-11.png)
+
+Next step is creating new file again named **NewTask.jsx** file
+
+```javascript
+export default function NewTask() {
+    return (
+        <div className="flex items-center gap-4">
+            <input type="text" className="w-64 px-2 rounded-sm bg-stone-200" />
+            <button className="text-stone-700 hover:text-stone-950">Add Task</button>
+        </div>
+    );
+}
+```
+
+So in *Tasks.jsx* file we can import the component class of *NewTask.jsx*
+
+```javascript
+import NewTask from "./NewTask.jsx";
+
+export default function Tasks() {
+    return <section>
+        <h2 className="text-2xl font-bold text-stone-700 mb-4">Tasks</h2>
+        <NewTask />
+        NEWE TASK
+        <p className="text-stone-800 mb-4">
+            This project does not have any task yet.
+        </p>
+        <ul>
+
+        </ul>
+    </section>
+}
+```
+
+If we save this and open the browser we'll see the updates :
+
+![alt text](image-12.png)
+</details>
