@@ -1580,4 +1580,183 @@ Here is the result after the codes being changed :
 
 ![alt text](image-10.png)
 
+Note : We'll see the details of our project after created.
+
+</details>
+
+<details>
+<summary>Handling Project Deletion</summary>
+
+First in *App.jsx* component file, we need to add function for deletion, here we named handleDeleteProject. And at variable let content we edit also the code 
+
+```javascript
+function handleDeleteProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+        projects: prevState.projects.filter(
+          (project) => project.id !== prevState.selectedProjectId
+        ),
+      };
+    });
+  }
+```
+
+```javascript
+let content = (
+    <SelectedProject project={selectedProject} onDelete={handleDeleteProject} />
+);
+```
+
+So, in SelectedProject.jsx we add props onDelete in it's function and adding onClick={onDelete} in button tag
+
+```javascript
+export default function SelectedProject({ project, onDelete }) {
+```
+
+```javascript
+                <button className="text-stone-600 hover:text-stone-950"
+                    onClick={onDelete}
+                >
+                    Delete
+                </button>
+```
+
+Here are the complete codes of *App.jsx* and *SelectedProject.jsx* files :
+
+```javascript
+import { useState } from "react";
+
+import NewProject from "./components/NewProject.jsx";
+import NoProjectSelected from "./components/NoProjectSelected.jsx";
+import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+import SelectedProject from './components/SelectedProject';
+
+function App() {
+
+  const [projectsState, setProjectsState] = useState({
+    selectedProjectId: undefined,
+    projects: []
+  });
+
+  function handleSelectProject(id) {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: id,
+      };
+    });
+  }
+
+  function handleStartAddProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: null,
+      };
+    });
+  }
+
+  function handleCancelAddProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+      };
+    });
+  }
+
+  function handleAddProject(projectData) {
+    setProjectsState(prevState => {
+      const projectId = Math.random()
+      const newProject = {
+        ...projectData,
+        id: projectId
+      };
+
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+        projects: [...prevState.projects, newProject],
+      };
+    });
+  }
+
+  function handleDeleteProject() {
+    setProjectsState(prevState => {
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+        projects: prevState.projects.filter(
+          (project) => project.id !== prevState.selectedProjectId
+        ),
+      };
+    });
+  }
+
+  const selectedProject = projectsState.projects.find(project => project.id === projectsState.selectedProjectId);
+
+  let content = (
+    <SelectedProject project={selectedProject} onDelete={handleDeleteProject} />
+  );
+
+  if(projectsState.selectedProjectId === null) {
+    content = (
+      <NewProject onAdd={handleAddProject} onCancel={handleCancelAddProject} />
+    );
+  } else if(projectsState.selectedProjectId === undefined) {
+    content = <NoProjectSelected onStartAddProject={handleStartAddProject} />;
+  }
+
+  return (
+    <main className="h-screen my-8 flex gap-8">
+      <ProjectsSidebar 
+        onStartAddProject={handleStartAddProject} 
+        projects={projectsState.projects} 
+        onSelectProject={handleSelectProject}
+      />
+      {content}
+    </main>
+  );
+}
+
+export default App;
+```
+
+```javascript
+export default function SelectedProject({ project, onDelete }) {
+
+    const formattedDate = new Date(project.dueDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+
+    return (
+        <div className="w-[35rem] mt-16">
+        <header className="pb-4 mb-4 border-b-2 border-stone-300">
+            <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold text-stone-600 mb-2">
+                    {project.title}
+                </h1>
+                <button className="text-stone-600 hover:text-stone-950"
+                    onClick={onDelete}
+                >
+                    Delete
+                </button>
+            </div>
+            <p className="mb-4 text-stone-400">{formattedDate}</p>
+            <p className="text-stone-600 whitespace-pre-wrap">{project.description}</p>
+        </header>
+        TASK
+        </div>
+    );
+}
+```
+
+If we save this and open the browser, we now can add the project and we can delete the projects
+
+
+
 </details>
