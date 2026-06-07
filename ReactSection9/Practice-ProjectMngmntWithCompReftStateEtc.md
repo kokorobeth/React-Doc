@@ -1966,5 +1966,23 @@ export default function Tasks({ onAdd, onDelete }) {
 }
 ```
 
+In *NewTask.jsx* we can add onAdd props in the function ant in the function of handleClick
+
+```javascript
+import { useState } from 'react';
+
+export default function NewTask({ onAdd }) {
+
+    const [enteredTask, setEnteredTask] = useState();
+
+    function handleChange(event) {
+        setEnteredTask(event.target.value);
+    }
+
+    function handleClick() {
+        onAdd(enteredTask);
+        setEnteredTask('');
+    }
+```
 
 </details>
