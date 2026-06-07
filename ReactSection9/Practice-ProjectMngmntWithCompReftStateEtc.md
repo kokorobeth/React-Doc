@@ -1817,7 +1817,6 @@ export default function Tasks() {
     return <section>
         <h2 className="text-2xl font-bold text-stone-700 mb-4">Tasks</h2>
         <NewTask />
-        NEWE TASK
         <p className="text-stone-800 mb-4">
             This project does not have any task yet.
         </p>
@@ -1831,4 +1830,141 @@ export default function Tasks() {
 If we save this and open the browser we'll see the updates :
 
 ![alt text](image-12.png)
+</details>
+
+<details>
+<summary>Managing Tasks & Understanding Prop Driling</summary>
+
+So, in *NewTask.jsx* file we can add useState, also create function named handleChange and adding props on it etc.
+
+```javascript
+import { useState } from 'react';
+
+export default function NewTask() {
+
+    const [enteredTask, setEnteredTask] = useState();
+
+    function handleChange(event) {
+        setEnteredTask(event.target.value);
+    }
+    return (
+        <div className="flex items-center gap-4">
+            <input 
+                type="text" 
+                className="w-64 px-2 rounded-sm bg-stone-200"
+                onChange={handleChange}
+                value={enteredTask}
+            />
+            <button className="text-stone-700 hover:text-stone-950">Add Task</button>
+        </div>
+    );
+}
+```
+
+Now we jump into *App.jsx* file. Here we add task: [] in *const [projectsState, setProjectsState] = useState* row. Also adding functions like handleAddTask() and handleDeleteTask() 
+
+```javascript
+function App() {
+
+  const [projectsState, setProjectsState] = useState({
+    selectedProjectId: undefined,
+    projects: [],
+    tasks: []
+  });
+
+  function handleAddTask() {}
+
+  function handleDeleteTask() {}
+```
+
+Go back again into *NewTask.jsx* file, we add a function again named function handleClick() and add onClick in button tag 
+
+```javascript
+function handleClick() {
+        setEnteredTask('');
+    }
+
+    return (
+        <div className="flex items-center gap-4">
+            <input 
+                type="text" 
+                className="w-64 px-2 rounded-sm bg-stone-200"
+                onChange={handleChange}
+                value={enteredTask}
+            />
+            <button 
+                className="text-stone-700 hover:text-stone-950"
+                onClick={handleClick}
+            >Add Task</button>
+        </div>
+```
+
+Go back again in *App.jsx* file and adding onAddTask={handleAddTask} & onDeleteTask={handleDeleteTask} in let content
+
+```javascript
+  let content = (
+    <SelectedProject 
+      project={selectedProject} 
+      onDelete={handleDeleteProject} 
+      onAddTask={handleAddTask}
+      onDeleteTask={handleDeleteTask}
+    />
+  );
+```
+
+After that we should add props onAddTask and onDeleteTask in props of *SelectedProject.jsx* file and also adding <Tasks onAdd={onAddTask} onDelete={onDeleteTask}
+
+```javascript
+import Tasks from "./Tasks";
+
+export default function SelectedProject({ project, onDelete, onAddTask, onDeleteTask }) {
+
+    const formattedDate = new Date(project.dueDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+
+    return (
+        <div className="w-[35rem] mt-16">
+        <header className="pb-4 mb-4 border-b-2 border-stone-300">
+            <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold text-stone-600 mb-2">
+                    {project.title}
+                </h1>
+                <button className="text-stone-600 hover:text-stone-950"
+                    onClick={onDelete}
+                >
+                    Delete
+                </button>
+            </div>
+            <p className="mb-4 text-stone-400">{formattedDate}</p>
+            <p className="text-stone-600 whitespace-pre-wrap">{project.description}</p>
+        </header>
+        <Tasks onAdd={onAddTask} onDelete={onDeleteTask} />
+        </div>
+    );
+}
+```
+
+Go again on *Tasks.jsx* file, just adding props of onAdd and onDelete like this :
+
+```javascript
+import NewTask from "./NewTask.jsx";
+
+export default function Tasks({ onAdd, onDelete }) {
+    return <section>
+        <h2 className="text-2xl font-bold text-stone-700 mb-4">Tasks</h2>
+        <NewTask onAdd={onAdd} />
+        <p className="text-stone-800 mb-4">
+            This project does not have any task yet.
+        </p>
+        <ul>
+
+        </ul>
+    </section>
+}
+```
+
+
 </details>
