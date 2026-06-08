@@ -1983,6 +1983,346 @@ export default function NewTask({ onAdd }) {
         onAdd(enteredTask);
         setEnteredTask('');
     }
+
+    return (
+        <div className="flex items-center gap-4">
+            <input 
+                type="text" 
+                className="w-64 px-2 rounded-sm bg-stone-200"
+                onChange={handleChange}
+                value={enteredTask}
+            />
+            <button 
+                className="text-stone-700 hover:text-stone-950"
+                onClick={handleClick}
+            >Add Task</button>
+        </div>
+    );
+}
 ```
 
+So we update again by adding onAddTask in props of *SelectedProject.jsx* file. 
+
+```javascript
+import Tasks from "./Tasks";
+
+export default function SelectedProject({ 
+    project, 
+    onDelete, 
+    onAddTask, 
+    onDeleteTask 
+}) {
+```
+
+Also in *App.jsx* we can modify the function of handleAddTask into :
+
+```javascript
+function handleAddTask(text) {
+    setProjectsState(prevState => {
+      const taskId = Math.random();
+      const newTask = {
+        text: text,
+        projectId: prevState.selectedProjectId,
+        id: taskId,
+      };
+
+      return {
+        ...prevState,
+        selectedProjectId: undefined,
+        tasks: [newTask, ...prevState.tasks]
+      };
+    });
+  }
+```
+
+After that, we can go back to *Tasks.jsx* file adding props task and modify the codes of Tailwind css on that.
+
+```javascript
+import NewTask from "./NewTask.jsx";
+
+export default function Tasks({ tasks, onAdd, onDelete }) {
+    return (
+    <section>
+        <h2 className="text-2xl font-bold text-stone-700 mb-4">Tasks</h2>
+        <NewTask onAdd={onAdd} />
+        {tasks.length === 0 && (
+            <p className="text-stone-800 mb-4">
+                This project does not have any task yet.
+            </p>
+        )}
+        {tasks.length > 0 && (
+            <ul className="p-4 mt-8 rounded-md bg-stone-100">
+            {tasks.map((tasks) => (
+                <li key={tasks.id} className="flex justify-between my-4">
+                    <span>{tasks.text}</span>
+                    <button className="text-stone-700 hover:text-red-500">
+                        Clear
+                    </button>
+                </li>
+            ))}
+        </ul>
+        )}
+    </section>
+    );
+}
+```
+
+Again in *App.jsx* we can add task properti in varible *let content* like this :
+
+```javascript
+  let content = (
+    <SelectedProject 
+      project={selectedProject} 
+      onDelete={handleDeleteProject} 
+      onAddTask={handleAddTask}
+      onDeleteTask={handleDeleteTask}
+      tasks={projectsState.tasks}
+    />
+  );
+```
+
+So in *SelectedProject.jsx* we can add props task in it's function and the tag of <Taks 
+
+```javascript
+export default function SelectedProject({ 
+    project, 
+    onDelete, 
+    onAddTask, 
+    onDeleteTask,
+    task
+}) {
+```
+
+```javascript
+<Tasks onAdd={onAddTask} onDelete={onDeleteTask} tasks={tasks} />
+```
+And here are the complete codes of each classes :
+
+```javascript
+  import { useState } from "react";
+
+  import NewProject from "./components/NewProject.jsx";
+  import NoProjectSelected from "./components/NoProjectSelected.jsx";
+  import ProjectsSidebar from "./components/ProjectsSidebar.jsx";
+  import SelectedProject from './components/SelectedProject';
+
+  function App() {
+
+    const [projectsState, setProjectsState] = useState({
+      selectedProjectId: undefined,
+      projects: [],
+      tasks: []
+    });
+
+    function handleAddTask(text) {
+      setProjectsState(prevState => {
+        const taskId = Math.random();
+        const newTask = {
+          text: text,
+          projectId: prevState.selectedProjectId,
+          id: taskId,
+        };
+
+        return {
+          ...prevState,
+          selectedProjectId: undefined,
+          tasks: [newTask, ...prevState.tasks]
+        };
+      });
+    }
+
+
+    function handleDeleteTask() {}
+
+    function handleSelectProject(id) {
+      setProjectsState(prevState => {
+        return {
+          ...prevState,
+          selectedProjectId: id,
+        };
+      });
+    }
+
+    function handleStartAddProject() {
+      setProjectsState(prevState => {
+        return {
+          ...prevState,
+          selectedProjectId: null,
+        };
+      });
+    }
+
+    function handleCancelAddProject() {
+      setProjectsState(prevState => {
+        return {
+          ...prevState,
+          selectedProjectId: undefined,
+        };
+      });
+    }
+
+    function handleAddProject(projectData) {
+      setProjectsState(prevState => {
+        const projectId = Math.random();
+        const newProject = {
+          ...projectData,
+          id: projectId
+        };
+
+        return {
+          ...prevState,
+          selectedProjectId: undefined,
+          projects: [...prevState.projects, newProject],
+        };
+      });
+    }
+
+    function handleDeleteProject() {
+      setProjectsState(prevState => {
+        return {
+          ...prevState,
+          selectedProjectId: undefined,
+          projects: prevState.projects.filter(
+            (project) => project.id !== prevState.selectedProjectId
+          ),
+        };
+      });
+    }
+
+    const selectedProject = projectsState.projects.find(project => project.id === projectsState.selectedProjectId);
+
+    let content = (
+      <SelectedProject 
+        project={selectedProject} 
+        onDelete={handleDeleteProject} 
+        onAddTask={handleAddTask}
+        onDeleteTask={handleDeleteTask}
+        tasks={projectsState.tasks}
+      />
+    );
+
+    if(projectsState.selectedProjectId === null) {
+      content = (
+        <NewProject onAdd={handleAddProject} onCancel={handleCancelAddProject} />
+      );
+    } else if(projectsState.selectedProjectId === undefined) {
+      content = <NoProjectSelected onStartAddProject={handleStartAddProject} />;
+    }
+
+    return (
+      <main className="h-screen my-8 flex gap-8">
+        <ProjectsSidebar 
+          onStartAddProject={handleStartAddProject} 
+          projects={projectsState.projects} 
+          onSelectProject={handleSelectProject}
+        />
+        {content}
+      </main>
+    );
+  }
+
+  export default App;
+```
+
+```javascript
+import Tasks from "./Tasks";
+
+export default function SelectedProject({ 
+    project, 
+    onDelete, 
+    onAddTask, 
+    onDeleteTask,
+    task
+}) {
+
+    const formattedDate = new Date(project.dueDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+
+    return (
+        <div className="w-[35rem] mt-16">
+        <header className="pb-4 mb-4 border-b-2 border-stone-300">
+            <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold text-stone-600 mb-2">
+                    {project.title}
+                </h1>
+                <button className="text-stone-600 hover:text-stone-950"
+                    onClick={onDelete}
+                >
+                    Delete
+                </button>
+            </div>
+            <p className="mb-4 text-stone-400">{formattedDate}</p>
+            <p className="text-stone-600 whitespace-pre-wrap">{project.description}</p>
+        </header>
+        <Tasks onAdd={onAddTask} onDelete={onDeleteTask} tasks={tasks} />
+        </div>
+    );
+}
+```
+
+```javascript
+import NewTask from "./NewTask.jsx";
+
+export default function Tasks({ tasks, onAdd, onDelete }) {
+    return (
+    <section>
+        <h2 className="text-2xl font-bold text-stone-700 mb-4">Tasks</h2>
+        <NewTask onAdd={onAdd} />
+        {tasks.length === 0 && (
+            <p className="text-stone-800 mb-4">
+                This project does not have any task yet.
+            </p>
+        )}
+        {tasks.length > 0 && (
+            <ul className="p-4 mt-8 rounded-md bg-stone-100">
+            {tasks.map((tasks) => (
+                <li key={tasks.id} className="flex justify-between my-4">
+                    <span>{tasks.text}</span>
+                    <button className="text-stone-700 hover:text-red-500">
+                        Clear
+                    </button>
+                </li>
+            ))}
+        </ul>
+        )}
+    </section>
+    );
+}
+```
+
+```javascript
+import { useState } from 'react';
+
+export default function NewTask({ onAdd }) {
+
+    const [enteredTask, setEnteredTask] = useState();
+
+    function handleChange(event) {
+        setEnteredTask(event.target.value);
+    }
+
+    function handleClick() {
+        onAdd(enteredTask);
+        setEnteredTask('');
+    }
+
+    return (
+        <div className="flex items-center gap-4">
+            <input 
+                type="text" 
+                className="w-64 px-2 rounded-sm bg-stone-200"
+                onChange={handleChange}
+                value={enteredTask}
+            />
+            <button 
+                className="text-stone-700 hover:text-stone-950"
+                onClick={handleClick}
+            >Add Task</button>
+        </div>
+    );
+}
+```
 </details>
