@@ -458,3 +458,7 @@ export default function Shop({ children }) {
 ```
 
 </details>
+
+<details>
+<summary>Introducing the Context API</summary>
+</details>
