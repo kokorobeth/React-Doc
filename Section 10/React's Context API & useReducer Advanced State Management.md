@@ -462,3 +462,174 @@ export default function Shop({ children }) {
 <details>
 <summary>Introducing the Context API</summary>
 </details>
+
+<details>
+<summary>Creating & Providing The Context</summary>
+
+In **src** folder we create new folder named **store** . So inside store folder we can create *shopping-cart-context.jsx* file name. And in that file we should import createContext from react.
+
+```javascript
+import { createContext } from 'react';
+
+export const CartContext = createContext({
+    items: []
+});
+```
+
+Then go to *App.jsx* file and import the file of *shopping-cart-context.jsx* and after return code use the Wrap CartContext tag
+
+```javascript
+import { CartContext } from './store/shopping-cart-context.jsx';
+```
+
+From this :
+```javascript
+return (
+    <>
+      <Header
+        cart={shoppingCart}
+        onUpdateCartItemQuantity={handleUpdateCartItemQuantity}
+      />
+      <Shop>
+        {DUMMY_PRODUCTS.map((product) => (
+          <li key={product.id}>
+            <Product {...product} onAddToCart={handleAddItemToCart} />
+          </li>
+        ))}
+      </Shop>
+    </>
+  );
+```
+
+To :
+```javascript
+return (
+    <CartContext>
+      <Header
+        cart={shoppingCart}
+        onUpdateCartItemQuantity={handleUpdateCartItemQuantity}
+      />
+      <Shop>
+        {DUMMY_PRODUCTS.map((product) => (
+          <li key={product.id}>
+            <Product {...product} onAddToCart={handleAddItemToCart} />
+          </li>
+        ))}
+      </Shop>
+    </CartContext>
+  );
+```
+
+Note : But when we use the old version of react the wrapper of the tag in CartContext we can call Provider like this :
+
+```javascript
+  return (
+    <CartContext.Provider>
+      <Header
+        cart={shoppingCart}
+        onUpdateCartItemQuantity={handleUpdateCartItemQuantity}
+      />
+      <Shop>
+        {DUMMY_PRODUCTS.map((product) => (
+          <li key={product.id}>
+            <Product {...product} onAddToCart={handleAddItemToCart} />
+          </li>
+        ))}
+      </Shop>
+    </CartContext.Provider>
+  );
+```
+
+So here is the complete codes of *App.jsx* component file :
+
+```javascript
+import { useState } from 'react';
+
+import Header from './components/Header.jsx';
+import Shop from './components/Shop.jsx';
+import Product from './components/Product.jsx';
+import { DUMMY_PRODUCTS } from './dummy-products.js';
+import { CartContext } from './store/shopping-cart-context.jsx';
+
+function App() {
+  const [shoppingCart, setShoppingCart] = useState({
+    items: [],
+  });
+
+  function handleAddItemToCart(id) {
+    setShoppingCart((prevShoppingCart) => {
+      const updatedItems = [...prevShoppingCart.items];
+
+      const existingCartItemIndex = updatedItems.findIndex(
+        (cartItem) => cartItem.id === id
+      );
+      const existingCartItem = updatedItems[existingCartItemIndex];
+
+      if (existingCartItem) {
+        const updatedItem = {
+          ...existingCartItem,
+          quantity: existingCartItem.quantity + 1,
+        };
+        updatedItems[existingCartItemIndex] = updatedItem;
+      } else {
+        const product = DUMMY_PRODUCTS.find((product) => product.id === id);
+        updatedItems.push({
+          id: id,
+          name: product.title,
+          price: product.price,
+          quantity: 1,
+        });
+      }
+
+      return {
+        items: updatedItems,
+      };
+    });
+  }
+
+  function handleUpdateCartItemQuantity(productId, amount) {
+    setShoppingCart((prevShoppingCart) => {
+      const updatedItems = [...prevShoppingCart.items];
+      const updatedItemIndex = updatedItems.findIndex(
+        (item) => item.id === productId
+      );
+
+      const updatedItem = {
+        ...updatedItems[updatedItemIndex],
+      };
+
+      updatedItem.quantity += amount;
+
+      if (updatedItem.quantity <= 0) {
+        updatedItems.splice(updatedItemIndex, 1);
+      } else {
+        updatedItems[updatedItemIndex] = updatedItem;
+      }
+
+      return {
+        items: updatedItems,
+      };
+    });
+  }
+
+  return (
+    <CartContext.Provider>
+      <Header
+        cart={shoppingCart}
+        onUpdateCartItemQuantity={handleUpdateCartItemQuantity}
+      />
+      <Shop>
+        {DUMMY_PRODUCTS.map((product) => (
+          <li key={product.id}>
+            <Product {...product} onAddToCart={handleAddItemToCart} />
+          </li>
+        ))}
+      </Shop>
+    </CartContext.Provider>
+  );
+}
+
+export default App;
+
+```
+</details>
