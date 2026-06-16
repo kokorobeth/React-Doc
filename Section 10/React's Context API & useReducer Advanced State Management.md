@@ -633,3 +633,9 @@ export default App;
 
 ```
 </details>
+
+<details>
+<summary>Consuming The Context</summary>
+
+
+</details>
