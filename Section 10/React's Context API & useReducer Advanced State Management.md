@@ -961,3 +961,9 @@ So if we save this and look on the website :
 
 ![alt text](image-1.png)
 </details>
+
+<details>
+<summary>A Different Way of Consuming Context</summary>
+
+
+</details>
