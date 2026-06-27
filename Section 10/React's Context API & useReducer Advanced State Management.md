@@ -1506,5 +1506,8 @@ export const CartContext = createContext({
     updateItemQuantity: () => {},
 });
 ```
+</details>
 
+<details>
+<summary>Outsourcing Context & State Into a Separate Provider Component</summary>
 </details>
