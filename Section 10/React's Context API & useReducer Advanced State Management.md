@@ -1305,12 +1305,8 @@ this app still works as it did before.
 You can still add items
 
 to the cart and update the cart from inside it.
-
-And this all works, but it's now all powered
-
-by this context feature, which as you see here
-
-did allow us to get rid of prop drilling.
+![alt text](image-2.png)
+And this all works, but it's now all powered by this context feature, which as you see here did allow us to get rid of prop drilling.
 
 **CartModal.jsx** *component*
 
