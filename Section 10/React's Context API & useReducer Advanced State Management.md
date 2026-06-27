@@ -1128,3 +1128,387 @@ that component function can then
 
 produce some new user interface.
 </details>
+
+<details>
+<summary>Migrating the Entire Demo Project to use the Context API</summary>
+
+So to fully migrate to context here, I'll start by removing this onAddToCart prop on the product component on *App.jsx*.
+
+```javascript
+      <Shop>
+        {DUMMY_PRODUCTS.map((product) => (
+          <li key={product.id}>
+            <Product {...product} onAddToCart={handleAddItemToCart} />
+          </li>
+        ))}
+      </Shop>
+```
+
+because I already removed it inside of the product component. There I'm not expecting it anymore I'll all the remove these two props on the header component because I plan on using context for that as well so that the header component itself does not take any props anymore.
+
+```javascript
+return (
+    <CartContext.Provider value={ctxValue}>
+      <Header />
+      <Shop>
+        {DUMMY_PRODUCTS.map((product) => (
+          <li key={product.id}>
+            <Product {...product} />
+          </li>
+        ))}
+      </Shop>
+    </CartContext.Provider>
+  );
+```
+
+Now, with that done, we can then go to the header component, for example, and in there we'll see 
+that it does actually need some data from the cart. It needs the quantity of all the items in the cart, so it needs the length of the cartItems array. And previously that, of course, was extracted 
+from that incoming cart prop. But now that I removed all those props, we have to find a different solution and we can import CartContext from going up a level, store/shopping-cart-context.jsx and also import the useContext hook, of course, so that in the header component function, we can reach out to our CartContext. And then from there, get this items array with the structuring, so that we have our items length here still  but we no longer wanna pass on this updating function here and also not the cartItems because those values can now be retrieved by the CartModal component itself from inside that component so that we end up with leaner code here in the header component.
+
+```javascript
+import { useRef, useContext } from 'react';
+
+import CartModal from './CartModal.jsx';
+import { CartContext } from '../store/shopping-cart-context.jsx';
+
+export default function Header() {
+  const modal = useRef();
+  const { items } = useContext(CartContext);
+
+  const cartQuantity = items.length;
+
+  function handleOpenCartClick() {
+    modal.current.open();
+  }
+
+  let modalActions = <button>Close</button>;
+
+  if (cartQuantity > 0) {
+    modalActions = (
+      <>
+        <button>Close</button>
+        <button>Checkout</button>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <CartModal ref={modal} title="Your Cart" actions={modalActions} />
+      <header id="main-header">
+        <div id="main-title">
+          <img src="logo.png" alt="Elegant model" />
+          <h1>Elegant Context</h1>
+        </div>
+        <p>
+          <button onClick={handleOpenCartClick}>Cart ({cartQuantity})</button>
+        </p>
+      </header>
+    </>
+  );
+}
+
+```
+
+In the **CartModal.jsx** component, we therefore now also wanna reach out to our context. In here, we wanna import CartContext from going up one level, store/shopping-cart-context.jsx and then import useContext here from React. And just as before, of course, use this useContext hook in this CartModal component here and pass CartContext as a value to useContext. And then here I need two things. I need the items and I need this updating function. And at the moment, this function to update the quantities of items isn't exposed to my context yet.
+
+It's not available through the context. Therefore, we must update this context value  and add a new property to this object here. The updateItemQuantity function, for example, which points at handleUpdateCartItemQuantity. I will also add it to my default value here where we create the context to get this better auto completion. Now with that, we can go back to the CartModal component
+
+and also extract the updateItemQuantity function there.
+
+But wait a second, do we actually need those values here?
+
+Well, if we take a look at our code here, the answer is no
+
+because this modal component
+
+actually does just wrap this cart component in the end.
+
+It does not need any cart information itself.
+
+So what we should do is we should get rid of those props
+
+on the cart component now and get rid of those props here
+
+on the CartModal component, the cartItems prop
+
+and the onUpdateCartItemQuantity prop.
+
+And we can get rid of the context here
+
+because we don't actually need it in this component.
+
+And therefore, we can also get rid of these imports
+
+because that's the advantage of using context.
+
+You can use it in exactly the place where you need it
+
+and you don't need to use it anywhere else.
+
+So it's now in the Cart.jsx component
+
+where I'm already using this context
+
+where we can now get rid of this prop
+
+because we're not getting a value for this prop any longer.
+
+And where we should now instead extract
+
+this updateItemQuantity function
+
+from our context so that in this cart component,
+
+we can call this updateItemQuantity function here
+
+and here on those two buttons,
+
+which can be clicked to edit the quantity of the cartItems.
+
+And with that, we're now not getting any props here
+
+in the cart component.
+
+In the CartModal component,
+
+we're also not getting any cart-related props anymore
+
+and we're not setting any props here.
+
+In the header component,
+
+we are using the cart, but we now are not passing any props
+
+with cart data to CartModal.
+
+And in the App component,
+
+we therefore also pass nothing to header,
+
+nothing to product, or nothing cart-related to be precise.
+
+And in the Product component, we therefore,
+
+also don't accept any cart-related props anymore
+
+because we're using context
+
+in all those components to get hold
+
+of those values and to manipulate those context values.
+
+And with that, if you save that and reload,
+
+this app still works as it did before.
+
+You can still add items
+
+to the cart and update the cart from inside it.
+
+And this all works, but it's now all powered
+
+by this context feature, which as you see here
+
+did allow us to get rid of prop drilling.
+
+**CartModal.jsx** *component*
+
+```javascript
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import Cart from './Cart';
+
+
+const CartModal = forwardRef(function Modal(
+  { title, actions },
+  ref
+) {
+  const dialog = useRef();
+
+  useImperativeHandle(ref, () => {
+    return {
+      open: () => {
+        dialog.current.showModal();
+      },
+    };
+  });
+
+  return createPortal(
+    <dialog id="modal" ref={dialog}>
+      <h2>{title}</h2>
+      <Cart />
+      <form method="dialog" id="modal-actions">
+        {actions}
+      </form>
+    </dialog>,
+    document.getElementById('modal')
+  );
+});
+
+export default CartModal;
+
+```
+
+**App.jsx** *component*
+
+```javascript
+import { useState } from 'react';
+
+import Header from './components/Header.jsx';
+import Shop from './components/Shop.jsx';
+import Product from './components/Product.jsx';
+import { DUMMY_PRODUCTS } from './dummy-products.js';
+import { CartContext } from './store/shopping-cart-context.jsx';
+
+function App() {
+  const [shoppingCart, setShoppingCart] = useState({
+    items: [],
+});
+
+  function handleAddItemToCart(id) {
+    setShoppingCart((prevShoppingCart) => {
+      const updatedItems = [...prevShoppingCart.items];
+
+      const existingCartItemIndex = updatedItems.findIndex(
+        (cartItem) => cartItem.id === id
+      );
+      const existingCartItem = updatedItems[existingCartItemIndex];
+
+      if (existingCartItem) {
+        const updatedItem = {
+          ...existingCartItem,
+          quantity: existingCartItem.quantity + 1,
+        };
+        updatedItems[existingCartItemIndex] = updatedItem;
+      } else {
+        const product = DUMMY_PRODUCTS.find((product) => product.id === id);
+        updatedItems.push({
+          id: id,
+          name: product.title,
+          price: product.price,
+          quantity: 1,
+        });
+      }
+
+      return {
+        items: updatedItems,
+      };
+    });
+  }
+
+  function handleUpdateCartItemQuantity(productId, amount) {
+    setShoppingCart((prevShoppingCart) => {
+      const updatedItems = [...prevShoppingCart.items];
+      const updatedItemIndex = updatedItems.findIndex(
+        (item) => item.id === productId
+      );
+
+      const updatedItem = {
+        ...updatedItems[updatedItemIndex],
+      };
+
+      updatedItem.quantity += amount;
+
+      if (updatedItem.quantity <= 0) {
+        updatedItems.splice(updatedItemIndex, 1);
+      } else {
+        updatedItems[updatedItemIndex] = updatedItem;
+      }
+
+      return {
+        items: updatedItems,
+      };
+    });
+  }
+
+  const ctxValue = {
+    items: shoppingCart.items,
+    addItemToCart: handleAddItemToCart,
+    updateItemQuantity: handleUpdateCartItemQuantity,
+  };
+
+  return (
+    <CartContext.Provider value={ctxValue}>
+      <Header />
+      <Shop>
+        {DUMMY_PRODUCTS.map((product) => (
+          <li key={product.id}>
+            <Product {...product} />
+          </li>
+        ))}
+      </Shop>
+    </CartContext.Provider>
+  );
+}
+
+export default App;
+
+```
+
+**Cart.jsx** *component*
+
+```javascript
+import { useContext } from 'react';
+
+import { CartContext } from "../store/shopping-cart-context";
+
+export default function Cart({ onUpdateItemQuantity }) {
+  const { items, updateItemQuantity } = useContext(CartContext);
+
+  const totalPrice = items.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  const formattedTotalPrice = `$${totalPrice.toFixed(2)}`;
+
+  return (
+    <div id="cart">
+      {items.length === 0 && <p>No items in cart!</p>}
+      {items.length > 0 && (
+        <ul id="cart-items">
+          {items.map((item) => {
+            const formattedPrice = `$${item.price.toFixed(2)}`;
+
+            return (
+              <li key={item.id}>
+                <div>
+                  <span>{item.name}</span>
+                  <span> ({formattedPrice})</span>
+                </div>
+                <div className="cart-item-actions">
+                  <button onClick={() => updateItemQuantity(item.id, -1)}>
+                    -
+                  </button>
+                  <span>{item.quantity}</span>
+                  <button onClick={() => updateItemQuantity(item.id, 1)}>
+                    +
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      <p id="cart-total-price">
+        Cart Total: <strong>{formattedTotalPrice}</strong>
+      </p>
+    </div>
+  );
+}
+
+```
+
+**shopping-cart-context.jsx** *component*
+
+```javascript
+import { createContext } from 'react';
+
+export const CartContext = createContext({
+    items: [],
+    addItemToCart: () => {},
+    updateItemQuantity: () => {},
+});
+```
+
+</details>
