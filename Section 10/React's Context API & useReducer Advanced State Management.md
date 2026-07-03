@@ -2252,87 +2252,15 @@ export default function CartContextProvider({children}) {
 <details>
 <summary>Dispatching Actions & Editing State with useReducer</summary>
 
-So to now also update this state
+So to now also update this state we now have to edit this a and handle different actions that should lead to different state updates. And to understand this, let's actually start by dispatching an action with help of that second element here, this shoppingCartDispatch element in my case. The idea now simply is that for example here, in handleAddItemToCart instead of having  all the state updating logic in there, we just call this this dispatch function, which we got back from use reducer and we then use it to dispatch an action. And an action can be anything you want. It can be a string with some text, it can be a number but in most cases it's an object that has a property like type or identifier inside of it so that you can tell different actions apart from each other and handle them differently inside of your reducer.
 
-we now have to edit this a
+So here I'll add a type property and I'll set my type here to ADD_ITEM. So this is a string and in there I have this notation, which is just a convention you'll see in many React projects but which is not a must have. You could also have add-item like this or any identifier of your choice.
 
-and handle different actions that should lead
+But here I'll go for ADD_ITEM written like this and with that type added here we would be able to identify this action. But this action then also has some data attached to it that will be required to perform the action the idea of the product that should be added to the cart.
 
-to different state updates.
+And therefore I'll also add a second property to this object and this property again, can be named anything you want but often it's called payload but it could also be id or anything else.
 
-And to understand this,
-
-let's actually start by dispatching an action
-
-with help of that second element here,
-
-this shoppingCartDispatch element in my case.
-
-The idea now simply is that for example here,
-
-in handleAddItemToCart instead of having
-
-all the state updating logic in there,
-
-we just call this this dispatch function,
-
-which we got back from use reducer
-
-and we then use it to dispatch an action.
-
-And an action can be anything you want.
-
-It can be a string with some text, it can be a number
-
-but in most cases it's an object that has a property
-
-like type or identifier inside of it
-
-so that you can tell different actions apart from each other
-
-and handle them differently inside of your reducer.
-
-So here I'll add a type property
-
-and I'll set my type here to ADD_ITEM.
-
-So this is a string and in there I have this notation,
-
-which is just a convention you'll see
-
-in many React projects but which is not a must have.
-
-You could also have add-item like this
-
-or any identifier of your choice.
-
-But here I'll go for ADD_ITEM written like this
-
-and with that type added here
-
-we would be able to identify this action.
-
-But this action then also has some data attached to it
-
-that will be required to perform the action
-
-the idea of the product that should be added to the cart.
-
-And therefore I'll also add a second property
-
-to this object and this property again,
-
-can be named anything you want but often it's called payload
-
-but it could also be id or anything else.
-
-But I'll go for payload here
-
-and my payload here is the id.
-
-So this ID, which I'm getting as a parameter here
-
-is set as a payload on this action object.
+But I'll go for payload here and my payload here is the id. So this ID, which I'm getting as a parameter here is set as a payload on this action object.
 
 **shopping-cart-context.jsx**
 
@@ -2347,41 +2275,11 @@ is set as a payload on this action object.
     setShoppingCart((prevShoppingCart) => {
 ```
 
-And with that action dispatched here
+And with that action dispatched here we can go back to the Reducer function. And there whenever an action is dispatched this function will be executed and will get this action. So this argument which we passed to the dispatch function this object here for example as a value for this action parameter.
 
-we can go back to the Reducer function.
+So therefore in the Reducer function we could then check if action type or whichever identifier property you chose is equal to ADD_ITEM and if it is, we can update the state accordingly in there.
 
-And there whenever an action is dispatched
-
-this function will be executed and will get this action.
-
-So this argument which we passed to the dispatch function
-
-this object here for example
-
-as a value for this action parameter.
-
-So therefore in the Reducer function we could
-
-then check if action type
-
-or whichever identifier property you chose
-
-is equal to ADD_ITEM and if it is,
-
-we can update the state accordingly in there.
-
-And if we had more actions, we could add more if checks
-
-to also check for UPDATE_ITEM for example.
-
-But at the moment I have just this one action,
-
-which I'll dispatch and therefore now in here
-
-I wanna return some state that changed compared
-
-to the previous state snapshot.
+And if we had more actions, we could add more if checks to also check for UPDATE_ITEM for example. But at the moment I have just this one action, which I'll dispatch and therefore now in here I wanna return some state that changed compared to the previous state snapshot.
 
 To be precise, we can now copy the logic we have down here
 
