@@ -1742,3 +1742,509 @@ And with that, if you save that and you reload this app still works as it did be
 I still have my cart here and I can change this cart but now it works through context. And we outsourced all this context and state management code into a separate component so that if you had multiple contexts and multiple pieces of independent data in the same app you could simply create multiple context files and therefore keep your app component pretty lean. Because there you would just wrap your components with that context provider component.
 
 </details>
+
+<details>
+<summary>Introducing the useReducer Hook</summary>
+
+So when building more complex React apps,
+
+context can be a crucial feature since it can help
+
+with sharing state across multiple components.
+
+But what about the state management itself?
+
+In this context, which we have here
+
+we're managing this shoppingCart state.
+
+And as you can tell
+
+these state updating functions are rather complex.
+
+You could say they contain a bit more logic,
+
+at least a couple of lines of code.
+
+And that's of course not uncommon.
+
+But it also means that this component function,
+
+this CartContextProvider component function
+
+can get a bit hard to read.
+
+And even more importantly,
+
+as you can see I'm always using this function form
+
+of these state updating functions.
+
+I'm always passing a function to them
+
+because basically almost always
+
+if you are managing more complex state,
+
+an object or an array or anything like that
+
+you will need to update your state
+
+based on the previous state snapshot.
+
+So this is a pattern you'll use all the time.
+
+And therefore it's also kind of annoying
+
+to repeat this pattern all the time.
+
+And that's why in React,
+
+instead of managing state with useState and code like this,
+
+you could use another state management hook
+
+provided by React, a hook called useReducer.
+
+in **shopping-cart-context.jsx** file
+
+```javascript
+import { createContext, useState, useReducer } from 'react';
+import { DUMMY_PRODUCTS } from '../dummy-products';
+
+export const CartContext = createContext({
+    items: [],
+    addItemToCart: () => {},
+    updateItemQuantity: () => {},
+});
+
+export default function CartContextProvider({children}) {
+    const [shoppingCart, setShoppingCart] = useState({
+    items: [],
+  });
+```
+
+Now what's a reducer though?
+
+A reducer in React apps and JavaScript programming
+
+in general is typically a function
+
+that reduces one or more complex values to a simpler one.
+
+So for example, that reduces an array of numbers
+
+to a single number by adding up those numbers.
+
+And it's that reducer function which you define
+
+that could perform these additions.
+
+And indeed, in this demo project, which I prepared for you
+
+you can already see a reducer function in action
+
+in the Cart.jsx file.
+
+Here I'm using the built-in reduce method
+
+that can be used on any array in JavaScript,
+
+and that's totally independent of React
+
+and this useReducer hook, that's really important.
+
+This method also works outside of React projects.
+
+I'm using this method to define my reducer function
+
+that will be executed on all items in this items array.
+
+And here I'm then basically just updating my cart total
+
+based on some starting value
+
+by adding the price of every item times the quantity
+
+of that item in the cart to it.
+
+That's what I'm doing here in this function.
+
+And this therefore is such a reducer function
+
+because it's reducing an array of items to a single number,
+
+the total price of all those items in this case.
+
+And now the idea behind this useReducer hook
+
+is to use that same concept of reducing one or more values
+
+to a typically simpler value for state management purposes.
+
+So how do we use use reducer for state management?
+
+Well, in a React component,
+
+in this case in the CartContextProvider component,
+
+you execute the useReducer hook
+
+just as you would execute any other React hook function.
+
+Now the useReducer hook will then give you an array
+
+with exactly two elements,
+
+just as useState always gives you an array
+
+with two elements.
+
+And here in useReducer, just as with useState,
+
+the first element you'll get back will be your state
+
+that's managed by useReducer.
+
+And of course we could also name this shoppingCartState
+
+or anything like this.
+
+But the second value that will be part of this array,
+
+which you get back from useReducer
+
+will now not be a state updating function
+
+as you know it from useState,
+
+but instead a dispatch function
+
+which allows you to dispatch so-called actions
+
+that will then be handled
+
+by a two be defined reducer function.
+
+So here, I'll name it shoppingCartDispatch
+
+in **shopping-cart-context.jsx** file :
+
+```javascript
+export default function CartContextProvider({children}) {
+    const [ shoppingCartState, shoppingCartDispatch ] = useReducer();
+```
+
+to make it very clear that it belongs to this state.
+
+But you could also just name it dispatch to type a bit less.
+
+But here I'll go for shoppingCartDispatch.
+
+So now we've got the state and such a dispatch function,
+
+but as I just mentioned,
+
+we now also need a reducer function
+
+that will actually get triggered by dispatching values
+
+and that will then produce a new state
+
+because that's the idea behind this hook
+
+and the reducer function we have yet to add.
+
+So therefore here outside of this component function
+
+I'll add a new function,
+
+which I'll name shoppingCartReducer.
+
+in **shopping-cart-context.jsx** file :
+
+```javascript
+function shoppingCartReducer(state, action) {
+
+}
+
+export default function CartContextProvider({children}) {
+    const [ shoppingCartState, shoppingCartDispatch ] = useReducer();
+```
+
+And I'm defining this outside of this component function
+
+because this function should not be recreated
+
+whenever the component function executes
+
+because it also won't need direct access
+
+to any value defined or updated in the component function.
+
+It won't need access to props or anything like that.
+
+Hence I'm defining it outside of this component function.
+
+And this reducer function should now accept two parameters,
+
+a state parameter and an action parameter.
+
+And you should accept these two parameters here
+
+because this reducer function ultimately will be called
+
+by React after you dispatched a so-called action,
+
+which will also show you in a couple of minutes of course.
+
+And the action you will then dispatch
+
+with this dispatch function
+
+will indeed be the action you'll receive
+
+on that second parameter.
+
+But again, you'll see that in action soon.
+
+Now the state you'll get here , on the other hand
+
+will be the guaranteed latest state snapshot
+
+of that state that is managed by useReducer.
+
+So just as you get that guaranteed latest state snapshot
+
+when using that function form here
+
+for updating the state,
+
+React, which we'll call this reducer function for you
+
+will make sure that you'll get the latest state here
+
+as this first argument.
+
+Now inside of that shoppingCartReducer function,
+
+you should then return the updated state.
+
+And for the moment, I'll just return the unchanged state
+
+by just returning state like this,
+
+though that will of course soon change.
+
+But now with that, we have a basic,
+
+not too helpful at the moment reducer function.
+
+As a next step, we have to connect this reducer function
+
+to the useReducer hook.
+
+And to achieve this, you pass a pointer
+
+at that reducer function as a first argument to useReducer.
+
+Now this reducer function is registered for React
+
+and will be executed whenever you dispatch.
+
+Now, often you also might want to pass a second value
+
+to useReducer because that second value allows you
+
+to set an initial value for this state,
+
+which will be used if the state has never been updated yet.
+
+So basically the equivalent to what we're doing here
+
+when we're calling useState.
+
+This initial state I'm setting here can now be copied
+
+and can also be set as an initial state here
+
+for this reducer.
+
+So that we have the initial state and the reducer function
+
+as arguments to useReducer.
+
+in **shopping-cart-context.jsx** file :
+
+```javascript
+function shoppingCartReducer(state, action) {
+    return state;
+}
+
+export default function CartContextProvider({children}) {
+    const [ shoppingCartState, shoppingCartDispatch ] = useReducer(
+        shoppingCartReducer, 
+        {
+            items: [],
+        }
+    );
+```
+
+With that, this initial state will be received here
+
+and will be returned as state.
+
+Now we can therefore use this shoppingCartState value here,
+
+this first element returned by useReducer
+
+instead of the shoppingCardState we got from using useState.
+
+So we can use this shoppingCartState down there
+
+still in **shopping-cart-context.jsx** file
+
+```javascript
+  const ctxValue = {
+    items: shoppingCartState.items,
+    addItemToCart: handleAddItemToCart,
+    updateItemQuantity: handleUpdateCartItemQuantity,
+  };
+```
+
+where we are creating the context value
+
+to access the items on that state.
+
+Now at the moment, this of course means
+
+that we'll always have an empty array of items
+
+since that's my initial state here for my reducer.
+
+And I am not having any logic here that would change it.
+
+But for the moment, that's good enough.
+
+And if you save all your files
+
+and you reload your application,
+
+![alt text](image-4.png)
+
+you therefore don't get any error.
+
+And we see that we got no items in cart here,
+
+which makes sense.
+
+Now, if I change my state here,
+
+the cart doesn't update any longer of course
+
+because now I'm getting my value
+
+from that newly added reducer based state.
+
+And of course there we at the moment got no logic
+
+for updating that value,
+
+but that will change next.
+
+full codes of **shopping-cart-context.jsx** file :
+
+```javascript
+import { createContext, useState, useReducer } from 'react';
+import { DUMMY_PRODUCTS } from '../dummy-products';
+
+export const CartContext = createContext({
+    items: [],
+    addItemToCart: () => {},
+    updateItemQuantity: () => {},
+});
+
+function shoppingCartReducer(state, action) {
+    return state;
+}
+
+export default function CartContextProvider({children}) {
+    const [ shoppingCartState, shoppingCartDispatch ] = useReducer(
+        shoppingCartReducer, 
+        {
+            items: [],
+        }
+    );
+
+    const [shoppingCart, setShoppingCart] = useState({
+    items: [],
+  });
+
+  function handleAddItemToCart(id) {
+    setShoppingCart((prevShoppingCart) => {
+      const updatedItems = [...prevShoppingCart.items];
+
+      const existingCartItemIndex = updatedItems.findIndex(
+        (cartItem) => cartItem.id === id
+      );
+      const existingCartItem = updatedItems[existingCartItemIndex];
+
+      if (existingCartItem) {
+        const updatedItem = {
+          ...existingCartItem,
+          quantity: existingCartItem.quantity + 1,
+        };
+        updatedItems[existingCartItemIndex] = updatedItem;
+      } else {
+        const product = DUMMY_PRODUCTS.find((product) => product.id === id);
+        updatedItems.push({
+          id: id,
+          name: product.title,
+          price: product.price,
+          quantity: 1,
+        });
+      }
+
+      return {
+        items: updatedItems,
+      };
+    });
+  }
+
+  function handleUpdateCartItemQuantity(productId, amount) {
+    setShoppingCart((prevShoppingCart) => {
+      const updatedItems = [...prevShoppingCart.items];
+      const updatedItemIndex = updatedItems.findIndex(
+        (item) => item.id === productId
+      );
+
+      const updatedItem = {
+        ...updatedItems[updatedItemIndex],
+      };
+
+      updatedItem.quantity += amount;
+
+      if (updatedItem.quantity <= 0) {
+        updatedItems.splice(updatedItemIndex, 1);
+      } else {
+        updatedItems[updatedItemIndex] = updatedItem;
+      }
+
+      return {
+        items: updatedItems,
+      };
+    });
+  }
+
+  const ctxValue = {
+    items: shoppingCartState.items,
+    addItemToCart: handleAddItemToCart,
+    updateItemQuantity: handleUpdateCartItemQuantity,
+  };
+
+  return <CartContext.Provider value={ctxValue}>
+    {children}
+  </CartContext.Provider>
+}
+```
+</details>
