@@ -15,4 +15,13 @@ So these therefore, in the end, of course, are all features you already learned 
 
 But you'll also notice that this starting project also comes with a data.js file, which includes a bunch of dummy data responsible for outputting these place cards here in the end. And a loc.js file, which contains some location calculation logic, which we'll need throughout this section. And it's indeed this file, or specifically this function, which we'll need in the next lecture where we will also meet our first side effect.
 
+**Summary**
+
+**Dealing with Side Effects**
+*Keeping the UI Synchronized*
+
+- Understanding side effects & useEffect()
+- Effects & Dependencies
+- When NOT to use useEffect()
+
 </details>
