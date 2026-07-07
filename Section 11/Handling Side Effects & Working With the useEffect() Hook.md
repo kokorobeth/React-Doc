@@ -569,3 +569,544 @@ export default App;
 
 ```
 </details>
+
+<details>
+<summary>useEffect Not Needed: Another Example</summary>
+
+Now before we'll take another look at useEffect, let's stick at this local storage example here, because of course just storing items when we add them is not enough. The local storage should also be updated when we remove a place, by clicking on it here and confirming this. And of course, I also wanna load my data from local storage when the app starts, so that when that happens I pre-populate this box up here with my stored items.
+
+Now let's start with the code for deleting items from local storage. To do that, we again first need to fetch our stored IDs, so that we can then update them. And then we again need to update the stored items with a local storage setItem and update them with help of this key.
+
+And now the updated array in the end is based on the fetched existing array of data. And here we again need to create a stringified array and I'll create that array that should now be stored based on that stored IDs array with help of the filter method, which is built into the browser, basically, and which allows us to produce a new array, based on this array, and some filtering condition.
+
+For that filter takes a function that will be executed on every item in this array, and will get every item as an input to this function here. And then we have to return true, if we want to keep that item, and false if we want drop it.
+
+So therefore here, I'll simply check if the ID I am looking at here is not equal to selectedPlace.current, which is simply the ID of the place on which I clicked here, when I'm clicking on it in my first box. So if these two IDs do not match, I know that this is not the item I wanna delete, therefore I'm returning true and I keep the item. But if these IDs do match, this condition here will yield false and this ID will be removed from this array. And that's how we can store an updated array that does no longer contain this ID.
+
+**App.jsx** component file 
+```javascript
+function handleRemovePlace() {
+    setPickedPlaces((prevPickedPlaces) =>
+      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+    );
+    modal.current.close();
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || []; // codes to bottom added
+    localStorage.setItem('selectedPlaces', JSON.stringify(storedIds.filter((id) => id !== selectedPlace.current)))
+  }
+```
+
+Now last but not least, we of course also need to fetch these items when the app starts. 
+And here you might again think that you probably need useEffect, because of course we could now use useEffect, just as we used it here with navigator geolocation. And we could merge our code into this existing useEffect usage, or use it again, like all React hooks, you can use useEffect as often as you want and need to.
+
+And you could therefore think that the code for retrieving our places should go into useEffect here. So we can get our loaded places just as we're doing it down here, with help of local storage getItem, like this.
+
+And since these are only the IDs, but I want to get places with all the place related data, like the title and the image, we then need to map these IDs to actual place objects. By using the map method, for example, to convert every ID to a complete place object.
+
+And that can be done by taking this available places array, which is coming from the data JS file, which contains these place objects. And it's these objects to which I wanna map my IDs, and we can perform that mapping by using available places here, and by then finding a place for the ID we're having here.
+
+So find then also takes another function. And here we get every place from AVAILABLE_PLACES passed in automatically. And here I'm looking for the place where the ID is equal to this ID. And this code here will then simply give us an array of place objects based on this array of IDs, which we retrieve from local storage.
+
+And of course now we could call setPickedPlaces here and set this equal to storedPlaces. Now when we add an empty dependencies array, just as we did it down here, this effect function here will only run once after the app component function ran. And therefore will not enter an infinite loop, will fetch our data and populate our box with that fetched data.
+
+```javascript
+function App() {
+  const modal = useRef();
+  const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
+  const [pickedPlaces, setPickedPlaces] = useState([]);
+
+  useEffect(() => {
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    const storedPlaces = storedIds.map(id => 
+      AVAILABLE_PLACES.find((place) => place.id === id)
+    );
+
+    setPickedPlaces(storedPlaces);
+  }, []);
+```
+
+We could do it like that. And if I save that and I reload, you see indeed, I'm starting with the places I previously added here. And if I delete a place and I reload, that place is gone but the other places are still fetched. So this clearly works.
+
+But this here is now an example for a redundant usage of useEffect. Now, why is using useEffect like this redundant and actually not recommended?
+
+Because this code here, where we use local storage, unlike this code here where we gut the user's location, runs synchronously. Which means it basically finishes instantly. It's executed line by line and once a line finished execution, it's done. We have the final result.
+
+And this was not the case here for getCurrentPosition, when this line executed here it was not done yet. Instead it was only done once this callback function here was executed by the browser and that happened at some point in the future. We can even see that it takes some time if we reload because these places down here are not there instantly.
+
+But for local storage, that's not the case. We got no callback function or promise or anything like that here. Instead retrieving the data like this is instant. And therefore this app component function does not finish its execution cycle before fetching that data is done.
+
+We can therefore simply get rid of useEffect and get rid of that state updating function here, which would be a problem, because it would lead to an infinite loop. And we can simply move that code in front of the state initialization code and use the stored places, which again are available instantly here, to initialize our picked places state like this. So to use the stored places as an initial state value.
+
+**App.jsx** file :
+```javascript
+function App() {
+
+  const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+  const storedPlaces = storedIds.map(id =>  // this line until ; is moved from useEffect before.
+    AVAILABLE_PLACES.find((place) => place.id === id)
+  );
+
+  const modal = useRef();
+  const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
+  const [pickedPlaces, setPickedPlaces] = useState(storedPlaces); // updated the parameter
+```
+
+This works because this code runs synchronously and does not take some time to finish, during which the app component function execution would finish. That's not the case here.
+
+And we can actually even move that code out of the app component function, so that it only runs once in the entire application lifecycle, when this code file is parsed and executed for the first time.
+
+```javascript
+const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+const storedPlaces = storedIds.map(id => 
+  AVAILABLE_PLACES.find((place) => place.id === id)
+);
+
+function App() {
+
+  const modal = useRef();
+  const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
+  const [pickedPlaces, setPickedPlaces] = useState(storedPlaces);
+```
+
+Because there's no reason to put this into the app component, which would only mean that it runs again and again every time the app component function is executed, which in the end means that we're wasting some performance.
+
+Instead, it's enough to run this once when the overall app starts and then we can still use stored places in the component function, because this component function execution will run after this code in front of it.
+
+And therefore, if we change the code like this and we save this and reload, we're still fetching our places here. So this is still working and we can still manipulate them and of course also delete places, that all works.
+
+But now with side effects that don't need useEffect.
+
+The full code of **App.jsx** become :
+
+```javascript
+import { useRef, useState, useEffect } from 'react';
+
+import Places from './components/Places.jsx';
+import { AVAILABLE_PLACES } from './data.js';
+import Modal from './components/Modal.jsx';
+import DeleteConfirmation from './components/DeleteConfirmation.jsx';
+import logoImg from './assets/logo.png';
+import { sortPlacesByDistance } from './loc';
+
+const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+const storedPlaces = storedIds.map(id => 
+  AVAILABLE_PLACES.find((place) => place.id === id)
+);
+
+function App() {
+
+  const modal = useRef();
+  const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
+  const [pickedPlaces, setPickedPlaces] = useState(storedPlaces);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const sortedPlaces = sortPlacesByDistance(
+        AVAILABLE_PLACES,
+        position.coords.latitude,
+        position.coords.longitude
+      );
+
+    setAvailablePlaces(sortedPlaces);
+    });
+  }, []);
+
+  function handleStartRemovePlace(id) {
+    modal.current.open();
+    selectedPlace.current = id;
+  }
+
+  function handleStopRemovePlace() {
+    modal.current.close();
+  }
+
+  function handleSelectPlace(id) {
+    setPickedPlaces((prevPickedPlaces) => {
+      if (prevPickedPlaces.some((place) => place.id === id)) {
+        return prevPickedPlaces;
+      }
+      const place = AVAILABLE_PLACES.find((place) => place.id === id);
+      return [place, ...prevPickedPlaces];
+    });
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    if(storedIds.indexOf(id) === -1) {
+      localStorage.setItem(
+        'selectedPlaces', 
+        JSON.stringify([id, ...storedIds])
+      );
+    }
+  }
+
+  function handleRemovePlace() {
+    setPickedPlaces((prevPickedPlaces) =>
+      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+    );
+    modal.current.close();
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    localStorage.setItem('selectedPlaces', JSON.stringify(storedIds.filter((id) => id !== selectedPlace.current)))
+  }
+
+  return (
+    <>
+      <Modal ref={modal}>
+        <DeleteConfirmation
+          onCancel={handleStopRemovePlace}
+          onConfirm={handleRemovePlace}
+        />
+      </Modal>
+
+      <header>
+        <img src={logoImg} alt="Stylized globe" />
+        <h1>PlacePicker</h1>
+        <p>
+          Create your personal collection of places you would like to visit or
+          you have visited.
+        </p>
+      </header>
+      <main>
+        <Places
+          title="I'd like to visit ..."
+          fallbackText={'Select the places you would like to visit below.'}
+          places={pickedPlaces}
+          onSelectPlace={handleStartRemovePlace}
+        />
+        <Places
+          title="Available Places"
+          places={availablePlaces}
+          fallbackText={"Sorting places by distance..."}
+          onSelectPlace={handleSelectPlace}
+        />
+      </main>
+    </>
+  );
+}
+
+export default App;
+```
+</details>
+
+<details>
+<summary>Preparing Another Use-Case For useEffect</summary>
+
+So now that we got started with side effects that need and that don't need useEffect, let's take a closer look at useEffect and especially at this dependencies array.
+
+And for that, let's switch to this modal component. In there I got some code using the useImperativeHandle hook that ensures that we expose two methods, two functions, to the outside world here, a open and a closed function. And these functions will then internally, in this modal component, show or close the dialog element, which is also controlled with help of our ref here.
+
+So these exposed functions, these methods here, are used in the app component. There I have code where I call open and I have code where I call close. And my goal now is to actually handle this with help of an effect, with help of a side effect. So with help of the useEffect hook, because as you'll see, that's all the possible in situations like this.
+
+The full code of **Modal.jsx** file before updated :
+
+```javascript
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { createPortal } from 'react-dom';
+
+const Modal = forwardRef(function Modal({ children }, ref) {
+  const dialog = useRef();
+
+  useImperativeHandle(ref, () => {
+    return {
+      open: () => {
+        dialog.current.showModal();
+      },
+      close: () => {
+        dialog.current.close();
+      },
+    };
+  });
+
+  return createPortal(
+    <dialog className="modal" ref={dialog}>
+      {children}
+    </dialog>,
+    document.getElementById('modal')
+  );
+});
+
+export default Modal;
+
+```
+
+And therefore here I'll get rid of this useImperativeHandle code, I'll delete it. And also delete this import. And also get rid of this ref prop because I don't need it anymore.
+
+And what we could now do as an alternative to the old approach is that this modal component accepts a prop, let's say a prop named open, though the name, of course, is totally up to you.
+
+Now as it turns out, the dialog element also has a open prop built into this element which we could then set to our open prop assuming that open is true or false, because that is what the open prop of the dialog element wants.
+
+
+**Modal.jsx** file component
+
+```javascript
+import { useRef } from 'react';
+import { createPortal } from 'react-dom';
+
+const Modal = forwardRef(function Modal({ open, children }) {
+  const dialog = useRef();
+
+  return createPortal(
+    <dialog className="modal" ref={dialog} open={open}>
+      {children}
+    </dialog>,
+    document.getElementById('modal')
+  );
+});
+
+export default Modal;
+
+```
+
+And with that change, we could go back to the app component. And now instead of opening and closing that modal with help of the modal ref, we could delete this ref 
+
+```javascript
+function App() {
+  // const modal = useRef(); // deteled
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
+  const [pickedPlaces, setPickedPlaces] = useState(storedPlaces);
+```
+and instead manage some extra state here which controls whether the modal should be open or not.
+
+```javascript
+function App() {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
+  const [pickedPlaces, setPickedPlaces] = useState(storedPlaces);
+```
+
+Initially it should be false so that the modal is not open. And here we could say IsOpen and set IsOpen. And maybe name it ModalIsOpen to be clear what exactly is open or not.
+
+And now in all the places where I called open, we should now call setModalIsOpen and set it to true. And in all the places where we called close, we should now call setModalIsOpen and set it to false. Of course, also down here.
+
+**App.jsx** file component
+
+*From*
+
+```javascript
+function handleStartRemovePlace(id) {
+    modal.current.open();
+    selectedPlace.current = id;
+  }
+
+  function handleStopRemovePlace() {
+    modal.current.close();
+  }
+```
+
+also in funcion below :
+
+```javascript
+function handleRemovePlace() {
+    setPickedPlaces((prevPickedPlaces) =>
+      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+    );
+    modal.current.close();
+```
+
+And changed into :
+
+```javascript
+function handleRemovePlace() {
+    setPickedPlaces((prevPickedPlaces) =>
+      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+    );
+    modal.current.close();
+```
+**Into :**
+
+```javascript
+function handleStartRemovePlace(id) {
+    setModalIsOpen(true); // changed
+    selectedPlace.current = id;
+  }
+
+  function handleStopRemovePlace() {
+    setModalIsOpen(false); // changed
+  }
+```
+
+aslo this function :
+
+```javascript
+function handleRemovePlace() {
+    setPickedPlaces((prevPickedPlaces) =>
+      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+    );
+    setModalIsOpen(false); // changed
+```
+
+Now we can use the modalIsOpen state and pass it as a value to this open prop. modalIsOpen. And we should remove this ref here because we don't have this modal ref anymore.
+
+**App.jsx** file :
+
+*From :*
+```javascript
+return (
+    <>
+      <Modal ref={modal}>
+        <DeleteConfirmation
+          onCancel={handleStopRemovePlace}
+          onConfirm={handleRemovePlace}
+        />
+      </Modal>
+```
+
+*Into :*
+```javascript
+  return (
+    <>
+      <Modal open={modalIsOpen}>
+        <DeleteConfirmation
+          onCancel={handleStopRemovePlace}
+          onConfirm={handleRemovePlace}
+        />
+      </Modal>
+```
+
+
+If we save that, you'll see that if I now click on an item, the modal does indeed open, but the backdrop is actually missing. This area behind the modal that grays out the page and makes sure that we can't interact with the rest of the page.
+
+This backdrop is missing. And it's missing because this backdrop is only added by the dialog element if we open it by calling the dialog's showModal method. Only when we call this method will this backdrop be added.
+
+the code of **Modal.jsx** changed into below 
+Here the full codes of *Modal.jsx*
+
+```javascript
+import { useRef } from 'react';
+import { createPortal } from 'react-dom';
+
+const Modal = forwardRef(function Modal({ open, children }) {
+  const dialog = useRef();
+
+  dialog.current.showModal(); // added
+
+  return createPortal(
+    <dialog className="modal" ref={dialog}>
+      {children}
+    </dialog>,
+    document.getElementById('modal')
+  );
+});
+
+export default Modal;
+
+```
+
+So therefore forwarding this open prop to the dialog as we're currently doing it does not really work. But we can still stick to this prop focused solution by again using useEffect.
+
+full codes of **App.jsx** component file :
+
+```javascript
+import { useRef, useState, useEffect } from 'react';
+
+import Places from './components/Places.jsx';
+import { AVAILABLE_PLACES } from './data.js';
+import Modal from './components/Modal.jsx';
+import DeleteConfirmation from './components/DeleteConfirmation.jsx';
+import logoImg from './assets/logo.png';
+import { sortPlacesByDistance } from './loc';
+
+const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+const storedPlaces = storedIds.map(id => 
+  AVAILABLE_PLACES.find((place) => place.id === id)
+);
+
+function App() {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
+  const [pickedPlaces, setPickedPlaces] = useState(storedPlaces);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const sortedPlaces = sortPlacesByDistance(
+        AVAILABLE_PLACES,
+        position.coords.latitude,
+        position.coords.longitude
+      );
+
+    setAvailablePlaces(sortedPlaces);
+    });
+  }, []);
+
+  function handleStartRemovePlace(id) {
+    setModalIsOpen(true);
+    selectedPlace.current = id;
+  }
+
+  function handleStopRemovePlace() {
+    setModalIsOpen(false);
+  }
+
+  function handleSelectPlace(id) {
+    setPickedPlaces((prevPickedPlaces) => {
+      if (prevPickedPlaces.some((place) => place.id === id)) {
+        return prevPickedPlaces;
+      }
+      const place = AVAILABLE_PLACES.find((place) => place.id === id);
+      return [place, ...prevPickedPlaces];
+    });
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    if(storedIds.indexOf(id) === -1) {
+      localStorage.setItem(
+        'selectedPlaces', 
+        JSON.stringify([id, ...storedIds])
+      );
+    }
+  }
+
+  function handleRemovePlace() {
+    setPickedPlaces((prevPickedPlaces) =>
+      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+    );
+    setModalIsOpen(false);
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    localStorage.setItem('selectedPlaces', JSON.stringify(storedIds.filter((id) => id !== selectedPlace.current)))
+  }
+
+  return (
+    <>
+      <Modal open={modalIsOpen}>
+        <DeleteConfirmation
+          onCancel={handleStopRemovePlace}
+          onConfirm={handleRemovePlace}
+        />
+      </Modal>
+
+      <header>
+        <img src={logoImg} alt="Stylized globe" />
+        <h1>PlacePicker</h1>
+        <p>
+          Create your personal collection of places you would like to visit or
+          you have visited.
+        </p>
+      </header>
+      <main>
+        <Places
+          title="I'd like to visit ..."
+          fallbackText={'Select the places you would like to visit below.'}
+          places={pickedPlaces}
+          onSelectPlace={handleStartRemovePlace}
+        />
+        <Places
+          title="Available Places"
+          places={availablePlaces}
+          fallbackText={"Sorting places by distance..."}
+          onSelectPlace={handleSelectPlace}
+        />
+      </main>
+    </>
+  );
+}
+
+export default App;
+```
+</details>
