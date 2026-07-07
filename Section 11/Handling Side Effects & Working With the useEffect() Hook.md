@@ -310,3 +310,97 @@ function App() {
 export default App;
 ```
 </details>
+
+<details>
+<summary>Using useEffect for Handling (Some) Side Effects</summary>
+
+So, how can we use "React useEffect Hook" to get rid of this problem? So, to handle this side effect in a better way.
+
+Well, first of all, we have to import it. useEffect from React.
+
+```javascript
+import { useRef, useState, useEffect } from 'react'; // --> import useEffect
+
+import Places from './components/Places.jsx';
+import { AVAILABLE_PLACES } from './data.js';
+import Modal from './components/Modal.jsx';
+import DeleteConfirmation from './components/DeleteConfirmation.jsx';
+import logoImg from './assets/logo.png';
+import { sortPlacesByDistance } from './loc';
+
+function App() {
+```
+
+And with it imported like all hooks, this hook must be executed in the component function, in the app component function.
+
+Now, useEffect, unlike useState or useRef does not return a value, though. Instead, useEffect needs two arguments. And the first argument is a function that should wrap your side effect code. So, in this case here, I'm creating an anonymous function and I move my location fetching state updating code into this anonymous function. That's the first step, but that's not all we have to do.
+
+Instead, you should also pass second argument to useEffect. So, after this anonymous function, and that second argument is an array of dependencies of that effect function. And I'll get back to these dependencies later. For now, just add an empty array.
+
+```javascript
+function App() {
+  const modal = useRef();
+  const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
+  const [pickedPlaces, setPickedPlaces] = useState([]);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const sortedPlaces = sortPlacesByDistance(
+        AVAILABLE_PLACES,
+        position.coords.latitude,
+        position.coords.longitude
+      );
+
+    setAvailablePlaces(sortedPlaces);
+    });
+  }, []);
+```
+
+Now, if you do that, if you change the code to look like this, you will not run into this infinite loop problem. And why is that?
+
+Because the idea behind useEffect is that this function which you pass as a first argument to useEffect will be executed by React after very important. After every component execution.
+
+So, if the app starts and the app component function executes, this code here will not be executed right away. Instead, it's only after the app component function execution finished. So, after this JSX code here has been returned, that this side effect function you passed to useEffect will be executed by React. So, React will execute that after the component function is done executing.
+
+Now, if you then update the state here, the component function executes again as you learned. And in theory this effect function would execute again. But that's where this dependencies array comes into play.
+
+If you define this dependencies array. So, if you do not omit it, but you define it. Then, React will actually take a look at the dependencies specified there. And it will only execute this effect function again. If the dependency values changed.
+
+Now, this might sound a bit abstract but I'll show you a use case. Where we have a dependency a little bit later. Here, where we have no dependencies. Those dependencies also can't change because we have none. So, they obviously never change.
+
+Therefore, React actually never re-executes this effect function. Instead, it only executes it once after this app component function was executed for the first time. But then this effect function is never executed again.
+
+If you would omit this dependencies array, this effect function would be executed after every app component render cycle. And therefore, we would still have an infinite loop. But with an empty dependencies array, that will not be the case.
+
+And therefore, with this out of the way. We will now set our available places to the sorted available places. Once we have to users' location without creating an infinite loop.
+
+And now, I'll just tweak the application a little bit. And down here on this places component, I'll add the fallback text prop, which is supported by this component and set it to Sorting places by distance. Which is simply some fallback text that will be shown during the time where we don't have any places yet. 
+
+**App.jsx** component file :
+```javascript
+        <Places
+          title="Available Places"
+          places={availablePlaces}
+          fallbackText={"Sorting places by distance..."} // adding code here
+          onSelectPlace={handleSelectPlace}
+        />
+```
+
+Because we're still looking for the user's location. Because initially of course, we don't have any places here. We start with an empty array.
+
+With all that, If you save that and you reload, you should see a little pop-up here, that asks you for permission to get your location. 
+
+![alt text](image.png)
+
+And if you click block, you'll break the app. So, here, I'll click allow. And with that it'll fetch my location which can take some time as I mentioned. 
+
+![alt text](image-1.png)
+
+But then, it'll present me these places sorted by distance to my location.
+
+Now of course, the order will depend on where you are located. For me, it looks pretty accurate. I'd say, I haven't checked all locations here. And it's just some dummy data anyways, but it looks correct.
+
+There also is no error in the console. And therefore, this code now works. And we're handling this side effect in a way that does not crash our app. Which I guess is always a good thing to have.
+
+</details>
