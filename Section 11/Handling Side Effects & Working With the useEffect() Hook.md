@@ -1334,6 +1334,30 @@ Set timeout takes two arguments and the first argument is a function. The second
 
 So if we want to close this modal after three seconds, we should call onConfirm inside of this callback function that executes after three seconds so that when this component is rendered, this timer here is set and we then execute onConfirm after three seconds.
 
+**DeleteConfirmation.jsx** component file :
+```javascript
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+  setTimeout(() => {
+    onConfirm();
+  }, 3000);
+
+  return (
+    <div id="delete-confirmation">
+      <h2>Are you sure?</h2>
+      <p>Do you really want to remove this place?</p>
+      <div id="confirmation-actions">
+        <button onClick={onCancel} className="button-text">
+          No
+        </button>
+        <button onClick={onConfirm} className="button">
+          Yes
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
 Now with this code, we'll face a couple of problems though. One problem is that this delete confirmation component is always rendered. It is rendered here by the app component and it's wrapped by the modal component, which is also always rendered, it's just not always visible in the DOM because internally the modal component controls the dialogue's visibility through this open prop by showing or hiding this dialogue.
 
 But technically this delete confirmation component is always part of the DOM, and therefore this timer will actually be set and started when the app component renders for the first time because during that render cycle, delete confirmation is also rendered.
@@ -1342,11 +1366,52 @@ Now to work around this issue, we could simply render delete confirmation condit
 
 A more elegant solution could be to render it here but to then go into the modal component and not always output this children prop so that the app component doesn't have to deal with conditionally rendering this, but instead it's the modal component where this might make more sense so that here we can check if open is true and if that's the case, we output the children, otherwise we render null here.
 
+**Modal.jsx**
+
+```javascript
+import { useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+
+function Modal({ open, children }) {
+  const dialog = useRef();
+
+  useEffect(() => {
+    if (open) {
+    dialog.current.showModal();
+  } else {
+    dialog.current.close();
+  }
+  }, [open]);
+
+  return createPortal(
+    <dialog className="modal" ref={dialog}>
+      {open ? children : null} //adding code open
+    </dialog>,
+    document.getElementById('modal')
+  );
+};
+
+export default Modal;
+
+```
+
 That would be an alternative solution that should also make sure that this timer is not set right away and we can confirm this by simply console logging timer set here.
+
+**Modal.jsx**
+
+```javascript
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+  console.log('TIMER SET'); // adding timer set
+  setTimeout(() => {
+    onConfirm();
+  }, 3000);
+```
 
 If I console log this, save this, and reload, I'm not seeing this in the log here which proves that it's not set right away but still this code here has a problem.
 
 And to show you this problem, let me try to remove one of these items here. If I do that, you see the timer is set and after three seconds the item was therefore removed.
+
+![alt text](image-2.png)
 
 But if I remove it myself before these three seconds expire, this timer will also still expire because we didn't stop it and that wasn't a problem here.
 
@@ -1355,4 +1420,97 @@ But it will be a problem if I click no because now you will see that even though
 Instead it was started and it keeps on going behind the scenes, independent from the question whether this component is currently visible or not.
 
 And that's of course a problem. And it is a problem that can be fixed with useEffect.
+</details>
+
+<details>
+<summary>Introducing useEffect's Cleanup Function</summary>
+
+Now, it's worth noting that this code here, of course, again in the end, is a side effect because it's not directly related to outputting this JSX code.
+
+And useEffect can fix this timer problem I showed you in the previous lecture because with useEffect, we can actually stop this timer when this component disappears. And I'll show you how.
+
+So, let's import useEffect from React here and let's then set the timer with help of useEffect by providing this effect function and our dependencies array. And now we can move this code here into this effect function.
+
+**DeleteConfirmation.jsx** component file :
+```javascript
+import { useEffect } from "react";
+
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+  useEffect(() => {
+    console.log('TIMER SET');
+    setTimeout(() => {
+      onConfirm();
+    }, 3000);
+  }, []);
+```
+
+And now just to be clear, for setting this timer, we would not need this effect function because setting the timer wasn't the problem. Neither does this create an infinite loop as we did it with the user location earlier, nor do we have the problem we faced in the modal where we needed to work with some ref that wasn't connected yet.
+
+Instead here the problem is not setting the timer but cleaning it up, getting rid of it, when this component function disappears.
+
+And that is also something useEffect can help you with because when using useEffect, you cannot just define this effect function, but also a cleanup function that should be executed right before this effect function runs again.
+
+And you define such a cleanup function by returning it from inside the effect function. So, this effect function can return another function which will then be executed by React right before this effect function runs again or, and that's the important part here, right before this component dismounts. So, before it's removed from the DOM.
+
+And therefore it's here in this cleanup function where we can now stop the timer. To do that, we can use the browser's built-in clear timeout function, which now just needs a reference of the timer that should be stopped.
+
+And thankfully, such a reference is returned by set timeout. So, we can simply store it in a constant, maybe named timer, and then pass timer to clear timeout. And this will now stop this timer whenever this component is removed from the DOM.
+
+Now, I also just again want to emphasize that this cleanup function would also run if that effect function would run again, then the cleanup function runs right before the effect function runs. But this is not something that can happen here because currently I have no dependencies here and therefore this effect function never runs again.
+
+Now as you see, I'm actually getting a warning here. So, I should add a dependency, to be precise, it's this unconfirmed prop which I'm using in here that should be added as a dependency but I'm deliberately not doing that just yet. And I'll explain why in just a second.
+
+Instead, let's keep this code like this and therefore the cleanup function will run only once when the component is removed.
+
+**DeleteConfirmation.jsx** 
+
+```javascript
+import { useEffect } from "react";
+
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+  useEffect(() => {
+    console.log('TIMER SET');
+    const timer = setTimeout(() => { // make a timer const
+      onConfirm();
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer); // adding a return and timer included.
+    }
+  }, []);
+```
+
+And let's save everything and reload.
+
+Now with that, if we wait for the sorted places to arrive, I can add some places, of course. And if I now open this and click no, you see the timer was set, but we don't have that problem that we faced before that the place is magically removed because the timer expires behind the scenes.
+
+![alt text](image-3.png)
+
+This is not happening anymore because we're cleaning up that timer. We can console log cleaning up timer here just to see that in action, kind of.
+
+```javascript
+import { useEffect } from "react";
+
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+  useEffect(() => {
+    console.log('TIMER SET');
+    const timer = setTimeout(() => {
+      onConfirm();
+    }, 3000);
+
+    return () => {
+      console.log('Cleaning up timer');
+      clearTimeout(timer);
+    }
+  }, []);
+```
+
+If I reload and I click here and I click no, you see cleaning up timer.
+
+![alt text](image-4.png)
+
+It's also worth noting that this cleanup function does not run right before the effect function is executed for the first time. It's only executed before subsequent executions of this effect function, and as mentioned, when this component is removed.
+
+And with that, we're now managing the timer as such that we don't cause any strange bugs in this application.
+
 </details>
