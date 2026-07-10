@@ -1513,4 +1513,39 @@ It's also worth noting that this cleanup function does not run right before the 
 
 And with that, we're now managing the timer as such that we don't cause any strange bugs in this application.
 
+Full codes of **DeleteConfirmation.jsx** file :
+
+```javascript
+import { useEffect } from "react";
+
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+  useEffect(() => {
+    console.log('TIMER SET');
+    const timer = setTimeout(() => {
+      onConfirm();
+    }, 3000);
+
+    return () => {
+      console.log('Cleaning up timer');
+      clearTimeout(timer);
+    }
+  }, []);
+
+  return (
+    <div id="delete-confirmation">
+      <h2>Are you sure?</h2>
+      <p>Do you really want to remove this place?</p>
+      <div id="confirmation-actions">
+        <button onClick={onCancel} className="button-text">
+          No
+        </button>
+        <button onClick={onConfirm} className="button">
+          Yes
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
 </details>
