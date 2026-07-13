@@ -1678,3 +1678,164 @@ export default function DeleteConfirmation({ onConfirm, onCancel }) {
 
 ```
 </details>
+
+<details>
+<summary>The useCallback Hook</summary>
+
+So in the last lecture, I explained why we can face an infinite loop when adding functions as dependencies to useEffect. It's a real problem, which I explained in great detail in that previous lecture.
+
+Now, thankfully though, the fix for this problem is straightforward and simple because React offers a hook which you can use to make sure that this function is not recreated all the time and you should use that special hook to fix this potential problem here.
+
+Now, this special hook, which you can use is the useCallback Hook, another hook offered by React. And the idea behind this hook here is that you wrap it around a function, around this handleRemovePlace function in this case here.
+
+For this, you execute useCallback and then you pass the function that should be wrapped as a first argument to useCallback. Then useCallback also takes a second argument which should be an array of dependencies, a concept that might sound familiar from useEffect.
+
+I'll get back to this array in just a second because useCallback also does something else. It returns a value. Specifically, it returns that function which you wrapped, but now such that it's not recreated whenever this surrounding component function is executed again.
+
+So with useCallback, React makes sure that this inner function is not recreated. Instead, it stores it internally in memory and reuses that stored function whenever the component function executes again.
+
+**App.jsx**
+```javascript
+import { useRef, useState, useEffect, useCallback } from 'react'; //import the useCallBack
+
+// another codes....
+
+const handleRemovePlace = useCallback(function handleRemovePlace() {
+    setPickedPlaces((prevPickedPlaces) =>
+      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+    );
+    //setModalIsOpen(false);
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    localStorage.setItem('selectedPlaces', JSON.stringify(storedIds.filter((id) => id !== selectedPlace.current)))
+  }, []); 
+  //the function codes of handleRemovePlace wrapped by useCallback
+```
+
+So now this is not recreated, and therefore, if we save this now and I reload and wait for this all to load, add an element and open this modal, now you see the timer is set, but it's then not set again.
+
+![alt text](image-6.png)
+
+The modal doesn't disappear because I haven't fixed this code yet, but we don't have this infinite loop anymore and that's why you should use useCallback when passing functions as dependencies to useEffect.
+
+But speaking of dependencies, useCallback actually also takes a dependency array here, and this dependency array indeed works exactly as the dependency array of useEffect.
+
+Here, you should add any prop or state values that are used inside of this wrapped function. And in this case, I got none. I'm using a state updating function, which does not have to be added, and I'm using some browser features like local storage or this JSON object, which also don't have to be added because they don't trigger this component to be rendered again or anything like that.
+
+It's prop or state values that should be added here. So therefore here, having an empty array is fine and just as with useEffect, React will now only recreate this function here with useCallback if your dependencies changed.
+
+But if you have an empty array of dependencies, there is nothing that could change and therefore, this function isn't recreated.
+
+And with that, I'll now comment back in that setModalIsOpen call so that the modal is removed. But I'll also keep useCallback because this gives us the extra safety that we won't face this infinite loop.
+
+Full code of **App.jsx** component file :
+
+```javascript
+import { useRef, useState, useEffect, useCallback } from 'react';
+
+import Places from './components/Places.jsx';
+import { AVAILABLE_PLACES } from './data.js';
+import Modal from './components/Modal.jsx';
+import DeleteConfirmation from './components/DeleteConfirmation.jsx';
+import logoImg from './assets/logo.png';
+import { sortPlacesByDistance } from './loc';
+
+const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+const storedPlaces = storedIds.map(id => 
+  AVAILABLE_PLACES.find((place) => place.id === id)
+);
+
+function App() {
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const selectedPlace = useRef();
+  const [availablePlaces, setAvailablePlaces] = useState([]);
+  const [pickedPlaces, setPickedPlaces] = useState(storedPlaces);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const sortedPlaces = sortPlacesByDistance(
+        AVAILABLE_PLACES,
+        position.coords.latitude,
+        position.coords.longitude
+      );
+
+    setAvailablePlaces(sortedPlaces);
+    });
+  }, []);
+
+  function handleStartRemovePlace(id) {
+    setModalIsOpen(true);
+    selectedPlace.current = id;
+  }
+
+  function handleStopRemovePlace() {
+    setModalIsOpen(false);
+  }
+
+  function handleSelectPlace(id) {
+    setPickedPlaces((prevPickedPlaces) => {
+      if (prevPickedPlaces.some((place) => place.id === id)) {
+        return prevPickedPlaces;
+      }
+      const place = AVAILABLE_PLACES.find((place) => place.id === id);
+      return [place, ...prevPickedPlaces];
+    });
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    if(storedIds.indexOf(id) === -1) {
+      localStorage.setItem(
+        'selectedPlaces', 
+        JSON.stringify([id, ...storedIds])
+      );
+    }
+  }
+
+  const handleRemovePlace = useCallback(function handleRemovePlace() {
+    setPickedPlaces((prevPickedPlaces) =>
+      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+    );
+    setModalIsOpen(false);
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    localStorage.setItem('selectedPlaces', JSON.stringify(storedIds.filter((id) => id !== selectedPlace.current)))
+  }, []);
+  
+
+  return (
+    <>
+      <Modal open={modalIsOpen}>
+          <DeleteConfirmation
+            onCancel={handleStopRemovePlace}
+            onConfirm={handleRemovePlace}
+          />
+      </Modal>
+
+      <header>
+        <img src={logoImg} alt="Stylized globe" />
+        <h1>PlacePicker</h1>
+        <p>
+          Create your personal collection of places you would like to visit or
+          you have visited.
+        </p>
+      </header>
+      <main>
+        <Places
+          title="I'd like to visit ..."
+          fallbackText={'Select the places you would like to visit below.'}
+          places={pickedPlaces}
+          onSelectPlace={handleStartRemovePlace}
+        />
+        <Places
+          title="Available Places"
+          places={availablePlaces}
+          fallbackText={"Sorting places by distance..."}
+          onSelectPlace={handleSelectPlace}
+        />
+      </main>
+    </>
+  );
+}
+
+export default App;
+```
+</details>
