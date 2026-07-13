@@ -1547,5 +1547,134 @@ export default function DeleteConfirmation({ onConfirm, onCancel }) {
   );
 }
 ```
+</details>
 
+<details>
+<summary>The Problem with Object & Function Dependencies</summary>
+
+So let's now take a closer look at this onConfirm prop, which we're using here in this effect.
+
+As you learned earlier in this section here, if you're using prop or state values in your effect function, you should add them as dependencies. So here, we should add the onConfirm prop as a dependency and you should not execute it but just point at it, use it as a value. By the way, if you had multiple dependencies, you would simply separate them with a comma. But here it's only one dependency that we need. This onConfirm prop.
+
+**DeleteConfirmation.jsx** component file :
+
+```javascript
+import { useEffect } from "react";
+
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+  useEffect(() => {
+    console.log('TIMER SET');
+    const timer = setTimeout(() => {
+      onConfirm();
+    }, 3000);
+
+    return () => {
+      console.log('Cleaning up timer');
+      clearTimeout(timer);
+    }
+  }, [onConfirm]); // adding onConfirm
+```
+
+But there is a problem you should be aware of when adding functions as dependencies. And onConfirm is a function in the end because this prop receives a function as a value.
+
+So onConfirm is a function and when adding functions as dependencies, there is a danger of creating an infinite loop.
+
+And here's why, because when you add a dependency to this array, like open, here in this modal component, you're telling React that this effect function should be re-executed whenever this modal component function executed, and if the open value changed.
+
+So in the case of open, if it was false and is now true, or if it was true and is now false. If the dependency would be a number or a string, the effect function would run again if that number or string changed.
+
+Now, when the dependency is a function, it's a bit trickier because this function, which we use here, this onConfirm function is in the end defined in the app component in this case. This onConfirm prop is set equal to this handleRemovePlace function.
+
+And of course, if you take a look at this function, you would probably say that it never changes, the code and the function is always the same, but technically, that's not correct because functions in JavaScript are just values. Specifically, they are objects.
+
+And this function object, this handleRemovePlace function object is indeed recreated every time this App component function executes because this entire function body then runs again.
+
+And all the values that are defined in this app component function are recreated whenever the app component function is executed again. So if I'm defining a variable here, hello, and this is the number one, this is technically recreated if this app component function runs again.
+
+Now, a function defined inside of this function, as it's the case for handleRemovePlace, is therefore also recreated. And since functions are objects in JavaScript, a new object is created.
+
+And as you might know in JavaScript, when you create two different objects, even if they have the same shape or the same code as it's the case here with the function, even if that's the case, they're not the same.
+
+And you can easily verify this with help of the developer tools in your browser. There, if you open that console, you can create a new function, hello, where you maybe just console.log('Hello').
+
+If I do that and I then create another function, hello2, which has exactly the same function body, so where I also just console.log('Hello'). If I do that and I then compare hello to hello2, I get false. They are not equal. JavaScript does not treat these two functions as equal even though they have the same code.
+
+And that's the case for objects in general in JavaScript. If I have an object A with a name of Max written like this and I then have an object B, which again, has exactly the same shape and the same value. In that case, these two are not treated as equal.
+
+And therefore, because objects and also specifically functions are not treated as equal, this onConfirm dependency of this effect function in the DeleteConfirmation component will be different between render cycles.
+
+Because when the app component re-renders, when this function is executed again, a brand new handleRemovePlace function will be created. And when that function is then received here in the DeleteConfirmation component, React takes a look at this new value, this new function and compares it to the old value, the old function. And it determines that these two are different for the reasons I just laid out.
+
+And therefore, React would go ahead and re-execute this effect function even though technically, this dependency didn't change.
+
+And this can lead to problems if in that function, which gets executed inside of this effect function, you are then updating the state again as it is the case here because that can then trigger an infinite loop.
+
+I'm updating the state here. This causes the app component function to run again, therefore a brand new handleRemovePlace function is created and passed to DeleteConfirmation. And therefore, there the effect function runs again, which then again triggers onConfirm and so on.
+
+Now, here in this app, specifically, due to how it works, we actually won't face this infinite loop problem because in this app, when onConfirm is called a state update is indeed triggered and we could therefore face this infinite loop.
+
+But this state update that is triggered, that setModalIsOpen(false), actually leads to DeleteConfirmation being removed from the DOM because it leads to the modal component removing the children from the DOM. And the children prop of the modal component holds this DeleteConfirmation component.
+
+So therefore, here indeed, we don't enter the infinite loop because this component disappears.
+
+Nonetheless, we face the danger of having such an infinite loop and we can see it in action if I go back to the app component and I temporarily disable setModalIsOpen so that DeleteConfirmation is not removed from the DOM.
+
+**App.jsx** component file :
+
+```javascript
+
+  function handleRemovePlace() {
+    setPickedPlaces((prevPickedPlaces) =>
+      prevPickedPlaces.filter((place) => place.id !== selectedPlace.current)
+    );
+    //setModalIsOpen(false);
+
+    const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
+    localStorage.setItem('selectedPlaces', JSON.stringify(storedIds.filter((id) => id !== selectedPlace.current)))
+  }
+```
+
+I'm still updating some other state. And therefore, the app component will re-render. And now, we will see an infinite loop in action.
+
+And you can see it if you go back and you reload and you then open this modal and you wait for the timer to expire and you'll see a new timer was set and another new timer and another new timer. And it continues on like this until we remove this modal here. But until then, we had this infinite loop.
+
+![alt text](image-5.png)
+
+And to avoid this infinite loop, we can of course make sure that we remove the element from the DOM as we're doing it with this state update. But a safer way, which will always work no matter if the element is removed or not, is to use another special React hook. A hook I'll show you in the next lecture.
+
+Full codes of **DeleteConfirmation.jsx** file :
+
+```javascript
+import { useEffect } from "react";
+
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+  useEffect(() => {
+    console.log('TIMER SET');
+    const timer = setTimeout(() => {
+      onConfirm();
+    }, 3000);
+
+    return () => {
+      console.log('Cleaning up timer');
+      clearTimeout(timer);
+    }
+  }, [onConfirm]);
+
+  return (
+    <div id="delete-confirmation">
+      <h2>Are you sure?</h2>
+      <p>Do you really want to remove this place?</p>
+      <div id="confirmation-actions">
+        <button onClick={onCancel} className="button-text">
+          No
+        </button>
+        <button onClick={onConfirm} className="button">
+          Yes
+        </button>
+      </div>
+    </div>
+  );
+}
+
+```
 </details>
