@@ -1991,4 +1991,156 @@ And with that, the interval will be stopped whenever this cleanup function runs,
 And with that, if we save everything and reload, if I wait for this here, add a place, open the modal, we got the interval, we got the timer but then it's done and we got no more log messages here.
 
 And that's therefore another example for useEffect being needed to avoid an infinite loop and the cleanup function being needed to avoid ongoing processes behind the scenes which aren't needed anymore but which, of course, would cost performance.
+
+![alt text](image-9.png)
+
+And then the full codes of **DeleteConfirmation.jsx** file are :
+
+```javascript
+import { useEffect, useState } from "react";
+
+const TIMER = 3000;
+
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+  const [remainingTime, setRemainingTime] = useState(TIMER);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('INTERVAL')
+      setRemainingTime(prevTime => prevTime - 10);
+    }, 10);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('TIMER SET');
+    const timer = setTimeout(() => {
+      onConfirm();
+    }, TIMER);
+
+    return () => {
+      console.log('Cleaning up timer');
+      clearTimeout(timer);
+    }
+  }, [onConfirm]);
+
+  return (
+    <div id="delete-confirmation">
+      <h2>Are you sure?</h2>
+      <p>Do you really want to remove this place?</p>
+      <div id="confirmation-actions">
+        <button onClick={onCancel} className="button-text">
+          No
+        </button>
+        <button onClick={onConfirm} className="button">
+          Yes
+        </button>
+      </div>
+      <progress value={remainingTime} max={TIMER}/>
+    </div>
+  );
+}
+
+```
+</details>
+
+<details>
+<summary>Optimizing State Updates</summary>
+
+Now, in the last lecture, I explained why we need useEffect to use setInterval correctly and I also mentioned that we want to clear the interval, not really to avoid some strange behaviors or bugs but to make sure that we don't impact the performance of this application.
+
+And speaking of performance, there is something that could be optimized here in this application because at the moment, I am managing this interval in my DeleteConfirmation component.
+
+And in this interval, we're updating the state every 10 milliseconds which means that this component runs every 10 milliseconds, which also means that every 10 milliseconds, React has to compare the onConfirm value here to figure out whether this effect function should run again.
+
+And React has to reevaluate this entire JSX code and this works and also doesn't really slow down the app here on a modern computer, but it's not optimal.
+
+It would be better to outsource this progress indicator and this related state logic and useEffect hook into a separate component so that it's then just this one single component that should be re-executed all the time.
+
+And therefore here I'll add a new component. **ProgressBar.jsx** could be a name that we want to use and, of course, export it here.
+
+And then in here in this component, I wanna manage this state. So I'll copy that and move it in here.
+
+And we, of course, want to have this useEffect hook, so I'll also copy that, or actually we can cut it and also remove this state now from the DeleteConfirmation and add it here to ProgressBar.
+
+And, of course, then return this progress element and remove that from the DeleteConfirmation and instead return it here.
+
+Now with that, we, of course, also must import useState and useEffect from React because we're using these things here and I need that TIMER.
+
+And we could, again, define it as a constant or simply accept it as a prop here. So use it here and here.
+
+And now we can use this ProgressBar component here in this DeleteConfirmation component.
+
+For that, we, of course, must import it from ProgressBar.jsx and we can get rid of the useState import here now.
+
+And now with that, it's not the entire DeleteConfirmation component that will be re-executed every 10 milliseconds, but it's, instead, inside of the ProgressBar component that this computation will take place.
+
+And this is an optimization you might wanna consider to avoid unnecessary computations.
+
+Of course, we now just have to make sure that we also do pass a value for this timer prop. So here in DeleteConfirmation, we should now set timer equal to TIMER.
+
+And if we now save that and go back and reload this app here, we should be able to add places.
+
+And when we click on a place, it will be deleted. We see the timer.
+
+And if we delete another place, a new timer starts in a new modal. And that all works as it should now.
+
+![alt text](image-10.png)
+
+Full codes of **ProgressBar.jsx** component :
+
+```javascript
+import { useState, useEffect } from "react";
+
+export default function ProgressBar({timer}) {
+    const [remainingTime, setRemainingTime] = useState(timer);
+
+    return <progress value={remainingTime} max={timer} />
+}
+```
+
+Then on **DeleteConfirmation.jsx** component we only need to add tag of ProgressBar and also import the necessary to be imported :
+
+```javascript
+import { useEffect, useState } from "react";
+import ProgressBar from "./ProgressBar"; // adding this
+
+const TIMER = 3000;
+
+export default function DeleteConfirmation({ onConfirm, onCancel }) {
+
+  useEffect(() => {
+    console.log('TIMER SET');
+    const timer = setTimeout(() => {
+      onConfirm();
+    }, TIMER);
+
+    return () => {
+      console.log('Cleaning up timer');
+      clearTimeout(timer);
+    }
+  }, [onConfirm]);
+
+  return (
+    <div id="delete-confirmation">
+      <h2>Are you sure?</h2>
+      <p>Do you really want to remove this place?</p>
+      <div id="confirmation-actions">
+        <button onClick={onCancel} className="button-text">
+          No
+        </button>
+        <button onClick={onConfirm} className="button">
+          Yes
+        </button>
+      </div>
+      <ProgressBar timer={TIMER}/> // adding this
+    </div>
+  );
+}
+```
+
+Note : The codes on *ProgressBar.jsx* is copy & paste from codes of *DeleteConfirmation.jsx* component
 </details>
