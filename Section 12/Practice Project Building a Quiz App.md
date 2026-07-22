@@ -663,6 +663,14 @@ And to implement this, we will now use useEffect. But of course, as you can tell
 
 I'll add a QuestionTimer component file called QuestionTimer.jsx. And in that file, I wanna export a new component function QuestionTimer. And here the goal in this file then is to display this progress bar, so the default progress element. But of course, this component will not just be about displaying this progress bar, it will also be about managing this progress bar.
 
+**QuestionTimer.jsx** component file (new file) :
+
+```javascript
+export default function QuestionTimer() {
+    return <progress />;
+}
+```
+
 Now, I will actually start by giving this an id, question-time, which is there for styling purposes. But then to add some logic, we also wanna set a timer that expires after sometime, and we can do that with the built-in setTimeout function as you learned before.
 
 We then just have to define after how much time this should expire. And here, I think it would be great if this QuestionTimer would be a configurable component, so that the exact time is not hard coded in this component, but can be defined in the component where this QuestionTimer component is being used.
@@ -715,7 +723,41 @@ And we can now use this remainingTime here to update this progress bar. There we
 
 Because keep in mind, this remainingTime initially is this timeout value, but it's then getting less and less as this time expires.
 
+**QuestionTimer.jsx** component file :
+
+```javascript
+import { useState, useEffect } from "react";
+
+export default function QuestionTimer({ timeout, onTimeout }) {
+    const [remainingTime, setRemainingTime] = useState(timeout);
+
+    useEffect(() => {
+        setTimeout(onTimeout, timeout);
+    }, [timeout, onTimeout]);
+    
+    useEffect(() => {
+        setInterval(() => {
+            setRemainingTime(prevRemainingTime => prevRemainingTime - 100);
+        }, 100);
+    }, []);
+
+    return <progress id="question-time" max={timeout} value={remainingTime} />;
+}
+```
+
 With that, we can go back to the Quiz component and there import this QuestionTimer component we just worked on from QuestionTimer.jsx and use that component here.
+
+**Quiz.jsx** file :
+
+```javascript
+import { useState } from 'react';
+
+import QUESTIONS from '../questions.js';
+import QuestionTimer from './QuestionTimer.jsx'; // added
+import quizCompleteImg from '../assets/quiz-complete.png';
+
+export default function Quiz() {
+```
 
 And I wanna display it right above my question text here inside of that question div. That's where I wanna output the QuestionTimer.
 
@@ -727,12 +769,108 @@ And onTimeout, of course, should be a function that should be executed once the 
 
 And here we could execute handleSelectAnswer, but pass null as a value. So that we add a new entry to this userAnswers array in this function, but the value we add is null, so that it's not actually an answer from the available answers, but instead a placeholder that basically tells us that no answer was chosen for this question.
 
+**Quiz.jsx** component file :
+
+```javascript
+return (
+        <div id='quiz'>
+            <div id='question'>
+                <QuestionTimer  // added
+                    timeout={10000} 
+                    onTimeout={() => handleSelectAnswer(null) } />
+                <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
+                <ul id='answers'>
+                    {shuffledAnswers.map((answer) => (
+                        <li key={answer} className='answer'>
+                            <button onClick={() => handleSelectAnswer(answer)}>{answer}</button>
+                        </li>
+                        ))}
+                </ul>
+            </div>
+        </div>
+```
+
 And with that, if we save that and reload, we see this timer here expiring and as it expires, nothing happens. Or actually something happens after a while, but not instantly as it expired.
+
+![alt text](image-5.png)
 
 Instead, as you see, if you reload, this timer expires and then we have to wait until at some point of time we do move on to the next question.
 
 And here we then of course have no timer as you see, instead it stays empty instead of resetting. And then at some point it still expires because it still seems to be going on behind the scenes, which is all the rather strange since it expired.
 
 So it looks like we need to fix a couple of things here.
+
+Full codes of **Quiz.jsx** file :
+
+```javascript
+import { useState } from 'react';
+
+import QUESTIONS from '../questions.js';
+import QuestionTimer from './QuestionTimer.jsx';
+import quizCompleteImg from '../assets/quiz-complete.png';
+
+export default function Quiz() {
+    const [userAnswers, setUserAnswers] = useState([]);
+
+    const activeQuestionIndex = userAnswers.length;
+    const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
+
+    function handleSelectAnswer(selectedAnswer) {
+        setUserAnswers((prevUserAnswers) => {
+            return [...prevUserAnswers, selectedAnswer];
+        });
+    }
+
+    if (quizIsComplete) {
+        return <div id='summary'>
+            <img src={quizCompleteImg} alt="Thropy icon" />
+            <h2>Quiz Completed!</h2>
+        </div>
+    }
+
+    const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers];
+    shuffledAnswers.sort(() => Math.random() - 0.5);
+
+    return (
+        <div id='quiz'>
+            <div id='question'>
+                <QuestionTimer 
+                    timeout={10000} 
+                    onTimeout={() => handleSelectAnswer(null) } />
+                <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
+                <ul id='answers'>
+                    {shuffledAnswers.map((answer) => (
+                        <li key={answer} className='answer'>
+                            <button onClick={() => handleSelectAnswer(answer)}>{answer}</button>
+                        </li>
+                        ))}
+                </ul>
+            </div>
+        </div>
+    )
+}
+```
+
+**QuestionTimer.jsx**
+
+```javascript
+import { useState, useEffect } from "react";
+
+export default function QuestionTimer({ timeout, onTimeout }) {
+    const [remainingTime, setRemainingTime] = useState(timeout);
+
+    useEffect(() => {
+        setTimeout(onTimeout, timeout);
+    }, [timeout, onTimeout]);
+    
+    useEffect(() => {
+        setInterval(() => {
+            setRemainingTime(prevRemainingTime => prevRemainingTime - 100);
+        }, 100);
+    }, []);
+
+    return <progress id="question-time" max={timeout} value={remainingTime} />;
+}
+```
 
 </details>
