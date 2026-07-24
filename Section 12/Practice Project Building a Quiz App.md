@@ -1344,15 +1344,137 @@ If it's undefined, I want to execute this code, because if it's undefined, I kno
 
 Now if we do that, we also have to make sure that we use shuffledAnswers.current down there in the JSX code as well.
 
+The temporary **Quiz.jsx** component file by adding useRef also adding the shuffledAnswer by calling current :
+
+```javascript
+import { useState, useCallback, useRef } from 'react';
+
+import QUESTIONS from '../questions.js';
+import QuestionTimer from './QuestionTimer.jsx';
+import quizCompleteImg from '../assets/quiz-complete.png';
+
+export default function Quiz() {
+    const shuffledAnswers = useRef();
+    const [answerState, setAnswerState] = useState('');
+    const [userAnswers, setUserAnswers] = useState([]);
+
+    const activeQuestionIndex = 
+        answerState === '' ? userAnswers.length : userAnswers.length - 1;
+    const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
+
+    const handleSelectAnswer = useCallback(function handleSelectAnswer(selectedAnswer) {
+        setAnswerState('answered');
+        setUserAnswers((prevUserAnswers) => {
+            return [...prevUserAnswers, selectedAnswer];
+        });
+
+        setTimeout(() => {
+            if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
+                setAnswerState('correct');
+            } else {
+                setAnswerState('wrong');
+            }
+
+            setTimeout(() => {
+                setAnswerState('');
+            }, 2000);
+        }, 1000);
+    }, [activeQuestionIndex]);
+
+    const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer] );
+
+    if (quizIsComplete) {
+        return <div id='summary'>
+            <img src={quizCompleteImg} alt="Thropy icon" />
+            <h2>Quiz Completed!</h2>
+        </div>
+    }
+
+    if (!shuffledAnswers.current) {
+        shuffledAnswers.current = [...QUESTIONS[activeQuestionIndex].answers];
+        shuffledAnswers.current.sort(() => Math.random() - 0.5);
+    }
+
+    return (
+        <div id='quiz'>
+            <div id='question'>
+                <QuestionTimer 
+                    key={activeQuestionIndex}
+                    timeout={10000} 
+                    onTimeout={handleSkipAnswer} />
+                <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
+                <ul id='answers'>
+                    {shuffledAnswers.current.map((answer) => {
+                        const isSelected = userAnswers[userAnswers.length - 1] === answer;
+                        let cssClass = '';
+
+                        if (answerState === 'answered' && isSelected) {
+                            cssClass = 'selected';
+                        }
+
+                        if ((answerState === 'correct' || answerState === 'wrong') && isSelected) {
+                            cssClass = answerState;
+                        }
+
+                        return (
+                            <li key={answer} className='answer'>
+                            <button 
+                                onClick={() => handleSelectAnswer(answer)} 
+                                className={cssClass}
+                            >
+                                {answer}
+                            </button>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
+        </div>
+    )
+}
+```
+
 And if we now save this and reload, and I now select an answer, you see that it stays in place and we don't shuffle those answers again. And you see that highlighting it as selected and then as right or wrong also works.
 
 But you'll also notice, that now as I select the answer and move to a new question, the answer actually stays selected, and what's even worse or also bad, is that in general, those answers now don't change anymore as we move to a new question. So the application is not working correctly anymore, and that is happening now because of our ref usage here, because I'm now never changing my shuffled answers here. I'm just shuffling them once and that's it.
 
+![alt text](image-9.png)
+
 And now one of the easiest ways of getting rid of this issue here, in my opinion is to simply create a new component, because React is all about components, and here you'll now see another example for why working with components is great and why they can help you solve complex problems.
 
-Because here we can add a new component, the Answers component, which lives in an Answers.jsx file, and it's a default component function that should be exported here. And my goal with this component here, is to output this list of shuffled answers.
+Because here we can add a new component, the **Answers.jsx** component, which lives in an Answers.jsx file, and it's a default component function that should be exported here. And my goal with this component here, is to output this list of shuffled answers.
 
 So I'll grab this unordered list here, this unordered list of answers, cut it from the quiz component, and add it here as a returned value in the Answers.jsx file.
+
+These below code from *Quiz.jsx* cut and paste in *Answers.jsx* component:
+
+```javascript
+<ul id='answers'>
+                    {shuffledAnswers.current.map((answer) => {
+                        const isSelected = userAnswers[userAnswers.length - 1] === answer;
+                        let cssClass = '';
+
+                        if (answerState === 'answered' && isSelected) {
+                            cssClass = 'selected';
+                        }
+
+                        if ((answerState === 'correct' || answerState === 'wrong') && isSelected) {
+                            cssClass = answerState;
+                        }
+
+                        return (
+                            <li key={answer} className='answer'>
+                            <button 
+                                onClick={() => handleSelectAnswer(answer)} 
+                                className={cssClass}
+                            >
+                                {answer}
+                            </button>
+                            </li>
+                        );
+                    })}
+                </ul>
+```
 
 Now of course, we'll need a bunch of information in this component now, in this answers component, to render those answers correctly. For example, we'll need that list of answers that should be rendered. So we need to get that array of answers as input, as a prop.
 
