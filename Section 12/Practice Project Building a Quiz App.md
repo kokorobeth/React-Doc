@@ -998,6 +998,8 @@ export default function Quiz() {
 
 And as I do that, if I reload, you'll see that the timeout and interval is set initially, but not thereafter. As we move to a new question, the timeout is now not set again.
 
+![alt text](image-7.png)
+
 Now we still have that weird pause after the timer expired where we're not moving on to the next answer instantly, or to the next question, but that's something we'll fix in the next lectures.
 
 **QuestionTimer.jsx** component file :
