@@ -943,7 +943,84 @@ A state updating functions like this don't have to be added here because React w
 
 Well, and with all that we now have functions that are not recreated just because the surrounding component function was executed again, and therefore it's now handleSkipAnswer which I pass to onTimeout.
 
+**Quiz.jsx** compoennt file after updated :
+
+```javascript
+import { useState, useCallback } from 'react';
+
+import QUESTIONS from '../questions.js';
+import QuestionTimer from './QuestionTimer.jsx';
+import quizCompleteImg from '../assets/quiz-complete.png';
+
+export default function Quiz() {
+    const [userAnswers, setUserAnswers] = useState([]);
+
+    const activeQuestionIndex = userAnswers.length;
+    const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
+
+    const handleSelectAnswer = useCallback(function handleSelectAnswer(selectedAnswer) {
+        setUserAnswers((prevUserAnswers) => {
+            return [...prevUserAnswers, selectedAnswer];
+        });
+    }, []);
+
+    const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer] );
+
+    if (quizIsComplete) {
+        return <div id='summary'>
+            <img src={quizCompleteImg} alt="Thropy icon" />
+            <h2>Quiz Completed!</h2>
+        </div>
+    }
+
+    const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers];
+    shuffledAnswers.sort(() => Math.random() - 0.5);
+
+    return (
+        <div id='quiz'>
+            <div id='question'>
+                <QuestionTimer 
+                    timeout={10000} 
+                    onTimeout={handleSkipAnswer} />
+                <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
+                <ul id='answers'>
+                    {shuffledAnswers.map((answer) => (
+                        <li key={answer} className='answer'>
+                            <button onClick={() => handleSelectAnswer(answer)}>{answer}</button>
+                        </li>
+                        ))}
+                </ul>
+            </div>
+        </div>
+    )
+}
+```
+
 And as I do that, if I reload, you'll see that the timeout and interval is set initially, but not thereafter. As we move to a new question, the timeout is now not set again.
 
 Now we still have that weird pause after the timer expired where we're not moving on to the next answer instantly, or to the next question, but that's something we'll fix in the next lectures.
+
+**QuestionTimer.jsx** component file :
+
+```javascript
+import { useState, useEffect } from "react";
+
+export default function QuestionTimer({ timeout, onTimeout }) {
+    const [remainingTime, setRemainingTime] = useState(timeout);
+
+    useEffect(() => {
+        console.log('SETTING TIMEOUT');
+        setTimeout(onTimeout, timeout);
+    }, [timeout, onTimeout]);
+    
+    useEffect(() => {
+        console.log('SETTING INTERVAL');
+        setInterval(() => {
+            setRemainingTime(prevRemainingTime => prevRemainingTime - 100);
+        }, 100);
+    }, []);
+
+    return <progress id="question-time" max={timeout} value={remainingTime} />;
+}
+```
 </details>
