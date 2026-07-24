@@ -1178,3 +1178,145 @@ export default function QuestionTimer({ timeout, onTimeout }) {
 }
 ```
 </details>
+
+<details>
+<summary>Highlighting Selected Answers & Managing More State</summary>
+
+So now that we got this working timer here, I'd like to enhance this application by making sure that as the user picks an answer here, I actually first highlight that answer. And then after a second the color of the answer changes to green if it was the correct answer or red if it was the wrong answer. And then after let's say two additional seconds, the next question should be loaded. So instead of instantly switching to a different question as an answer is selected, I'd like to lock the answer in and show the user whether it was right or wrong before moving on. That's my idea.
+
+And to implement this idea, some changes in the code are required. To be precise, in the quiz component, we'll have to work on this handleSelectAnswer function here because instead of storing the selected answer right away, which would lead to the next question being selected, I first of all wanna change the color of the selected answer.
+
+And to do that we could start managing a second piece of state here, which basically controls our current answer state. And that could be an empty string initially, for example, or a text like unanswered, to make it clear that the question has not been answered yet. But I'll go for an empty string and I'll name this answerState and have my setAnswerState updating function.
+
+And then here in handleSelectAnswer, I wanna change my answer state and change it to answered once the user did select an answer. Then I also want to set a timer in here with setTimeout so that after a second, let's say, so after 1000 milliseconds, we changed that answer state to correct if the correct answer was chosen, or to wrong if the wrong answer was chosen. And later we'll use this state to update the styling of the answer.
+
+So here after one second, I wanna find out whether it was the right or wrong answer. For that, we can add an if check here and simply take a look at the answer that was chosen by the user, so the selected answer, and simply compare it to the correct answer of the question which was presented to the user.
+
+And there we know that when it comes to the answers for all those questions, it's always the first answer in that raw data that's the correct answer. So if the selected answer is equal to this first answer, we know that the correct answer was chosen. So here we can therefore check if selectedAnswer is equal to QUESTIONS. So to my raw questions data, and there of course the activeQuestionIndex and then there take a look at the first answer in its list of answers.
+
+If our selected answer is equal to that first answer, we know it's the right answer that was picked. So then we can update our state and set answerState equal to correct like this. Else, we wanna set the answerState to wrong because then a wrong answer was picked.
+
+Now with that, I am using the activeQuestionIndex in this handleSelectAnswer function though. And since this is wrapped with useCallback, we therefore now have to add activeQuestionIndex to this dependencies array of useCallback. Because this function here that's wrapped by useCallback should be recreated whenever the activeQuestionIndex value changed because we're using that value in that function body and we don't want to use an outdated value here. So it's important that it gets recreated whenever this answer index changes. Hence it must be added here as a dependency.
+
+Now of course, another problem we'll face is that the activeQuestionIndex will change right away once the user answer has been selected. Now one workaround could be to move this code where we update this array of user answers into this timeout where we mark an answer as correct or wrong.
+
+But if we would do that, we would still move away from this question right after we know whether it was correct or wrong and we would not be able to update the styling and show the user that it was right or wrong because, well, we moved away right away.
+
+So what I'll do instead is I'll simply go back here and make sure that my activeQuestionIndex is equal to userAnswers.length if the current answerState is an empty string. So if the question has not been answered yet. So if this is an empty string, then my current activeQuestionIndex is equal to userAnswers.length. Otherwise it should be equal to userAnswers.length - 1, so that we still stick to the old questions, so to say.
+
+And that of course also implies that we need to reset the answerState to an empty string at some point. And I wanna reset it in here, after we marked the answer as correct or wrong. Here, I wanna set another timer. So I'm having some nested timers here which will only start after this timer expired. This timer could now be set to two seconds. And here I wanna set my answerState back to an empty string, which in the end makes sure that the answer gets reset. So to say, it's no longer marked as right or wrong. And due to the logic we added here, we will then also move on to the next question.
+
+So let's see whether that works and to see that, I also wanna update the styling of this component a little bit based on the answerState. And for that, I'll go to this button here and add a className to it and set that to a dynamic value.
+
+And this className here should either be an empty string if the answer has not been selected yet, it should be selected, let's say, if it has been selected, and it should be correct if it was selected and is correct and wrong if it was selected and is wrong.
+
+Therefore, here in this list, I'll actually expand this body of this function that we pass to map, cut this and return this list item like this and then derive the CSS class that should be added to this button here, so that we have the cssClasses variable here which should be used as a value, let's say.
+
+And now cssClasses should change depending on whether this answer was selected or not and whether it is correct or not if it was selected. So here I want to check if the answerState is equal to answered, which is one of the state values we are setting up here.
+
+And if that is the case, I of course wanna find out if it was this specific answer that's being output here that was selected because here we're outputting a list of answers and just one of them will have been selected.
+
+And we can find out whether it's this answer that has been selected by also taking a look at the userAnswers because I'm updating that as well as soon as the answer was selected. And we can simply take a look at the last element in there to find out which answer was picked.
+
+So here I'll add a little helper. Constant isSelected could be the name. And here I'll take a look at the userAnswers. And then there at the last element with userAnswers.length - 1 and that should be userAnswers, and check if that is equal to this answer, which we're currently outputting here.
+
+And if that's the case, we know that it's this answer that was selected. So then we can use isSelected down there. And we know that the answerState is answered and it's this answer that has been selected. So in that case, my CSS class that I wanna apply here is selected. And it should be selected because that's one of the classes I prepared in the index.css file. And I renamed this to cssClass also down here.
+
+And with that, we should be updating this as it is being selected.
+
+Now we wanna switch from selected to correct or wrong once we know that this answer is correct or wrong. And for that, we again can use the answerState because it's that state that is being set to correct or wrong.
+
+And to achieve this down here in the JSX code, we can add another if block where we check if answerState is equal to correct or answerState is equal to wrong. And... And we should now wrap that with parentheses.
+
+And if this answer is selected, of course, and if that's the case, I instead wanna set my CSS class to answerState, so to correct or wrong. And then it's the CSS class that is applied to the button.
+
+**Quiz.jsx** component :
+
+```javascript
+import { useState, useCallback } from 'react';
+
+import QUESTIONS from '../questions.js';
+import QuestionTimer from './QuestionTimer.jsx';
+import quizCompleteImg from '../assets/quiz-complete.png';
+
+export default function Quiz() {
+    const [answerState, setAnswerState] = useState('');
+    const [userAnswers, setUserAnswers] = useState([]);
+
+    const activeQuestionIndex = answerState === '' ? userAnswers.length : userAnswers.length - 1;
+    const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
+
+    const handleSelectAnswer = useCallback(function handleSelectAnswer(selectedAnswer) {
+        setAnswerState('answered');
+        setUserAnswers((prevUserAnswers) => {
+            return [...prevUserAnswers, selectedAnswer];
+        });
+
+        setTimeout(() => {
+            if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
+                setAnswerState('correct');
+            } else {
+                setAnswerState('wrong');
+            }
+
+            setTimeout(() => {
+                setAnswerState('');
+            }, 2000);
+        }, 1000);
+    }, [activeQuestionIndex]);
+
+    const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer] );
+
+    if (quizIsComplete) {
+        return <div id='summary'>
+            <img src={quizCompleteImg} alt="Thropy icon" />
+            <h2>Quiz Completed!</h2>
+        </div>
+    }
+
+    const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers];
+    shuffledAnswers.sort(() => Math.random() - 0.5);
+
+    return (
+        <div id='quiz'>
+            <div id='question'>
+                <QuestionTimer 
+                    key={activeQuestionIndex}
+                    timeout={10000} 
+                    onTimeout={handleSkipAnswer} />
+                <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
+                <ul id='answers'>
+                    {shuffledAnswers.map((answer) => {
+                        const isSelected = userAnswers[userAnswers.length - 1] === answer;
+                        let cssClass = '';
+
+                        if (answerState === 'answered' && isSelected) {
+                            cssClass = 'selected';
+                        }
+
+                        if ((answerState === 'correct' || answerState === 'wrong') && isSelected) {
+                            cssClass = answerState;
+                        }
+
+                        return (
+                            <li key={answer} className='answer'>
+                            <button 
+                                onClick={() => handleSelectAnswer(answer)} 
+                                className={cssClass}
+                            >
+                                {answer}
+                            </button>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
+        </div>
+    )
+}
+```
+
+And with that, if I save it and go back, if I click on an answer, you see it gets highlighted and then it gets marked as right or wrong, though as you also saw, it jumps around as I click on it. And that's super weird, of course. Why is it jumping around? Why is this not working?
+
+![alt text](image-8.png)
+</details>
