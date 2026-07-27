@@ -1480,6 +1480,40 @@ Now of course, we'll need a bunch of information in this component now, in this 
 
 In addition, I also need to know which answer was selected. So it would be nice to get some selectedAnswer prop which we can use. And we need that answerState, so whether an answer was selected at all, and if that selected answer is considered to be correct or not.
 
+For temporarily the component of **Answer.jsx** become :
+
+```javascript
+export default function Answers({answers, selectedAnswers, answerState}) {
+    return (
+        <ul id='answers'>
+            {shuffledAnswers.current.map((answer) => {
+                const isSelected = userAnswers[userAnswers.length - 1] === answer;
+                let cssClass = '';
+
+                if (answerState === 'answered' && isSelected) {
+                    cssClass = 'selected';
+                }
+
+                if ((answerState === 'correct' || answerState === 'wrong') && isSelected) {
+                            cssClass = answerState;
+                }
+
+                return (
+                    <li key={answer} className='answer'>
+                    <button 
+                        onClick={() => handleSelectAnswer(answer)} 
+                        className={cssClass}
+                    >
+                        {answer}
+                    </button>
+                    </li>
+                );
+            })}
+        </ul>
+    )
+}
+```
+
 So therefore back in the quiz component, we should import this newly added Answers component from the Answers.jsx file, and output that down here, below the question title, or question text.
 
 The answers that should then be output are not my shuffled answers, because I'll soon add that logic right inside of this answers component, but therefore instead my available answers for the selected question. So this value here, QUESTIONS[activeQuestionIndex].answers.
@@ -1493,6 +1527,115 @@ Now in the answers component, the shuffled answers should now be derived based o
 And we also of course need to be able to communicate back to the quiz component once our answer was selected, and therefore here I also expect to get an onSelect prop, or any name of your choice of course, which will receive a function as a value and which therefore will be called as a function down here.
 
 Now, back in the quiz component, we therefore also should add onSelect here, and point at handleSelectAnswer, and since the answers component will make sure that the answer that was selected is passed as a value to onSelect, we can now directly point at handleSelectAnswer here in the quiz component, because the answers component will pass the right value to this function.
+
+Temporary code changes in **Quiz.jsx** & **Answers.jsx** file :
+
+```javascript
+import { useRef } from "react";
+
+export default function Answers({answers, selectedAnswers, answerState, onSelect}) {
+
+    const shuffledAnswers = useRef();
+
+    if (!shuffledAnswers.current) {
+        shuffledAnswers.current = [...answers];
+        shuffledAnswers.current.sort(() => Math.random() - 0.5);
+    }
+
+    return (
+        <ul id='answers'>
+            {shuffledAnswers.current.map((answer) => {
+                const isSelected = selectedAnswers === answer;
+                let cssClass = '';
+
+                if (answerState === 'answered' && isSelected) {
+                    cssClass = 'selected';
+                }
+
+                if ((answerState === 'correct' || answerState === 'wrong') && isSelected) {
+                            cssClass = answerState;
+                }
+
+                return (
+                    <li key={answer} className='answer'>
+                    <button 
+                        onClick={() => onSelect(answer)} 
+                        className={cssClass}
+                    >
+                        {answer}
+                    </button>
+                    </li>
+                );
+            })}
+        </ul>
+    )
+}
+```
+
+```javascript
+import { useState, useCallback } from 'react';
+
+import QUESTIONS from '../questions.js';
+import QuestionTimer from './QuestionTimer.jsx';
+import Answers from './Answers.jsx';
+import quizCompleteImg from '../assets/quiz-complete.png';
+
+export default function Quiz() {
+    
+    const [answerState, setAnswerState] = useState('');
+    const [userAnswers, setUserAnswers] = useState([]);
+
+    const activeQuestionIndex = 
+        answerState === '' ? userAnswers.length : userAnswers.length - 1;
+    const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
+
+    const handleSelectAnswer = useCallback(function handleSelectAnswer(selectedAnswer) {
+        setAnswerState('answered');
+        setUserAnswers((prevUserAnswers) => {
+            return [...prevUserAnswers, selectedAnswer];
+        });
+
+        setTimeout(() => {
+            if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
+                setAnswerState('correct');
+            } else {
+                setAnswerState('wrong');
+            }
+
+            setTimeout(() => {
+                setAnswerState('');
+            }, 2000);
+        }, 1000);
+    }, [activeQuestionIndex]);
+
+    const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer] );
+
+    if (quizIsComplete) {
+        return <div id='summary'>
+            <img src={quizCompleteImg} alt="Thropy icon" />
+            <h2>Quiz Completed!</h2>
+        </div>
+    }
+
+    return (
+        <div id='quiz'>
+            <div id='question'>
+                <QuestionTimer 
+                    key={activeQuestionIndex}
+                    timeout={10000} 
+                    onTimeout={handleSkipAnswer} />
+                <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
+                <Answers 
+                    answers={QUESTIONS[activeQuestionIndex].answers} 
+                    selectedAnswers={userAnswers[userAnswers.length - 1]}
+                    answerState={answerState}
+                    onSelect={handleSelectAnswer}
+                />
+            </div>
+        </div>
+    )
+}
+```
 
 But how does this all help us with shuffling now?
 
@@ -1518,7 +1661,7 @@ So what could we do to fix this?
 
 Well, one thing that we could do, that also makes a lot of sense to do, is that we could create yet another component. Because as you already see, adding components does not just help with keeping your code manageable, but can also help you solve problems by splitting or combining logic that might otherwise interfere.
 
-So we could add a new Question component here, which I, of course, also export, and now here I wanna return that div with an id of question, and then in the end, move all this code here, and of course also this div in the end, into this Question component and replace this div here with it.
+So we could add a new **Question.jsx** file component here, which I, of course, also export, and now here I wanna return that div with an id of question, and then in the end, move all this code here, and of course also this div in the end, into this Question component and replace this div here with it.
 
 Now we must import QuestionTimer from QuestionTimer.jsx and import Answers from Answers.jsx.
 
@@ -1544,5 +1687,142 @@ But how does all that now help us with this key problem?
 
 Well, we can now get rid of that key here in the question component, and instead use a single key on this Question component here in Quiz.jsx, because in the end it is the entire question that should be reset whenever the active question index changes.
 
-And with that, we save this all, and I reload, you see the error is gone here, and if I pick an answer, it still works as before, but as we move to a new question, it's reset, and we also don't get any errors here and we can continue selecting and picking answers and move through those different questions, and that's now working as it should here.
+Full codes of these components **Quiz.jsx**, **Question.jsx**, **Answer.jsx** :
+
+```javascript
+import { useState, useCallback } from 'react';
+
+import QUESTIONS from '../questions.js';
+import quizCompleteImg from '../assets/quiz-complete.png';
+import Question from './Question.jsx';
+
+export default function Quiz() {
+    
+    const [answerState, setAnswerState] = useState('');
+    const [userAnswers, setUserAnswers] = useState([]);
+
+    const activeQuestionIndex = 
+        answerState === '' ? userAnswers.length : userAnswers.length - 1;
+    const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
+
+    const handleSelectAnswer = useCallback(function handleSelectAnswer(selectedAnswer) {
+        setAnswerState('answered');
+        setUserAnswers((prevUserAnswers) => {
+            return [...prevUserAnswers, selectedAnswer];
+        });
+
+        setTimeout(() => {
+            if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
+                setAnswerState('correct');
+            } else {
+                setAnswerState('wrong');
+            }
+
+            setTimeout(() => {
+                setAnswerState('');
+            }, 2000);
+        }, 1000);
+    }, [activeQuestionIndex]);
+
+    const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer] );
+
+    if (quizIsComplete) {
+        return <div id='summary'>
+            <img src={quizCompleteImg} alt="Thropy icon" />
+            <h2>Quiz Completed!</h2>
+        </div>
+    }
+
+    return (
+        <div id='quiz'>
+            <Question
+                key={activeQuestionIndex}
+                questionText={QUESTIONS[activeQuestionIndex].text}
+                answers={QUESTIONS[activeQuestionIndex].answers}
+                answerState={answerState}
+                selectedAnswer={userAnswers[userAnswers.length - 1]}
+                onSelectAnswer={handleSelectAnswer}
+                onSkipAnswer={handleSkipAnswer}
+            />
+        </div>
+    )
+}
+```
+
+```javascript
+import QuestionTimer from "./QuestionTimer.jsx";
+import Answers from "./Answers.jsx";
+
+export default function Question({
+    questionText, 
+    answers, 
+    onSelectAnswer, 
+    selectedAnswer, 
+    answerState,
+    onSkipAnswer
+}) {
+    return <div id="question">
+        <div id='question'>
+                <QuestionTimer timeout={10000} onTimeout={onSkipAnswer} />
+                <h2>{questionText}</h2>
+                <Answers
+                    answers={answers} 
+                    selectedAnswers={selectedAnswer}
+                    answerState={answerState}
+                    onSelect={onSelectAnswer}
+                />
+        </div>
+    </div>
+}
+```
+
+```javascript
+import { useRef } from "react";
+
+export default function Answers({
+    answers, 
+    selectedAnswers, 
+    answerState, 
+    onSelect}) {
+
+    const shuffledAnswers = useRef();
+
+    if (!shuffledAnswers.current) {
+        shuffledAnswers.current = [...answers];
+        shuffledAnswers.current.sort(() => Math.random() - 0.5);
+    }
+
+    return (
+        <ul id='answers'>
+            {shuffledAnswers.current.map((answer) => {
+                const isSelected = selectedAnswers === answer;
+                let cssClass = '';
+
+                if (answerState === 'answered' && isSelected) {
+                    cssClass = 'selected';
+                }
+
+                if ((answerState === 'correct' || answerState === 'wrong') && isSelected) {
+                            cssClass = answerState;
+                }
+
+                return (
+                    <li key={answer} className='answer'>
+                    <button 
+                        onClick={() => onSelect(answer)} 
+                        className={cssClass}
+                    >
+                        {answer}
+                    </button>
+                    </li>
+                );
+            })}
+        </ul>
+    )
+}
+```
+
+And with that, we save this all, and I reload, you see the error is gone here
+![alt text](image-10.png)
+, and if I pick an answer, it still works as before, but as we move to a new question, it's reset, and we also don't get any errors here and we can continue selecting and picking answers and move through those different questions, and that's now working as it should here.
 </details>
