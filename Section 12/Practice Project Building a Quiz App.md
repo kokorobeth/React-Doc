@@ -2314,7 +2314,13 @@ The display will get the mark if correct or wrong answer
 
 So to come to an end for this section and this quiz, I now wanna work on that quiz completed screen here, and there I wanna make sure that we basically tell the user how many questions were answered correctly, how many were answered incorrectly and how many questions were skipped, and then I wanna show the user details for every question.
 
-For this back here we can add a new component which could be named summary, in a summary.jsx file. And therefore a component function also is named summary. And here I then wanna return a div with an ID of summary. And in the end it's of course this div which we already have in the quiz JSX file, this div here. So I will actually cut that and move it from the quiz file to the summary file. And of course we also need to bring over that image import so that should also be removed from the quiz file and be moved to the summary JSX file so that the image gets imported here.
+For this back here we can add a new component which could be named summary, in a **Summary.jsx** file. And therefore a component function also is named summary. And here I then wanna return a div with an ID of summary. And in the end it's of course this div which we already have in the quiz JSX file, this div here. So I will actually cut that and move it from the *Quiz.jsx* file to the *Summary.jsx* file. And of course we also need to bring over that image import so that should also be removed from the quiz file and be moved to the summary JSX file so that the image gets imported here.
+
+this part of code 
+
+```javascript
+
+```
 
 And then here below this H2 element I want to have a div with an ID of summary stats where some overview stats should be presented. And here my goal is to have multiple paragraphs where in every paragraph I have a span with the percentage number of, for example, skipped questions, and that should get a class name of number for styling purposes, and then a second span with a class of text where I say skipped. And then we copy this paragraph and repeat it twice so that we also can output the correctly answered questions and the incorrectly answered questions. And of course those percentage numbers should be derived dynamically based on the actual answers picked by the user.
 
