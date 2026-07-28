@@ -1873,4 +1873,194 @@ Now to make sure that we mark the selectedAnswer as selected, we also should mak
 Now we can stick in that file to make sure that we then can't move through all those questions too quickly, because here I actually wanna make sure that we can't click those answer buttons if we have a selectedAnswer, so that we can't switch the answer thereafter. And therefore I'll set the disabled prop here and set that based on whether answerState is an empty string, which means we don't have an answer selected yet or anything else. It should be disabled if answerState is not equal to an empty string. Because if it is an empty string, it should be enabled. It should not be disabled because we have no answer yet. But if it is not equal to an empty string, we know that it should be disabled because we either have a correct or wrong answer or we don't know yet, but we did select an answer.
 
 And with that, if we save that and reload, now I can select an answer, it gets highlighted as such, the other answers get grayed out, and as you can tell, it then gets marked as right or wrong, and we move on to the next question thereafter.
+
+Here are the fix codes of each classes :
+
+**Answers.jsx** 
+
+```javascript
+import { useRef } from "react";
+
+export default function Answers({
+    answers, 
+    selectedAnswer, 
+    answerState, 
+    onSelect}) {
+
+    const shuffledAnswers = useRef();
+
+    if (!shuffledAnswers.current) {
+        shuffledAnswers.current = [...answers];
+        shuffledAnswers.current.sort(() => Math.random() - 0.5);
+    }
+
+    return (
+        <ul id='answers'>
+            {shuffledAnswers.current.map((answer) => {
+                const isSelected = selectedAnswer === answer;
+                let cssClass = '';
+
+                if (answerState === 'answered' && isSelected) {
+                    cssClass = 'selected';
+                }
+
+                if ((answerState === 'correct' || answerState === 'wrong') && isSelected) {
+                    cssClass = answerState;
+                }
+
+                return (
+                    <li key={answer} className='answer'>
+                    <button 
+                        onClick={() => onSelect(answer)} 
+                        className={cssClass} 
+                        disabled={answerState !== ''} 
+                    >
+                        {answer}
+                    </button>
+                    </li>
+                );
+            })}
+        </ul>
+    )
+}
+```
+
+**Question.jsx**
+
+```javascript
+import QuestionTimer from "./QuestionTimer.jsx";
+import Answers from "./Answers.jsx";
+import { useState } from "react";
+
+import QUESTIONS from '../questions.js';
+
+export default function Question({
+    index,
+    onSelectAnswer, 
+    onSkipAnswer
+}) {
+
+    const [answer, setAnswer] = useState({
+        selectedAnswer: '',
+        isCorrect: null
+    });
+
+    function handleSelectAnswer(answer) {
+        setAnswer({
+            selectedAnswer: answer,
+            isCorrect: null
+        });
+
+        setTimeout(() => {
+            setAnswer({
+                selectedAnswer: answer,
+                isCorrect: QUESTIONS[index].answers[0] === answer,
+            });
+
+            setTimeout(() => {
+                onSelectAnswer(answer);
+            }, 2000);
+        }, 1000);
+    }
+
+    let answerState = '';
+
+    if (answer.selectedAnswer && answer.isCorrect !== null) {
+        answerState = answer.isCorrect ? 'correct' : 'wrong';
+    } else if (answer.selectedAnswer) {
+        answerState = 'answered';
+    }
+
+    return <div id="question">
+        <div id='question'>
+                <QuestionTimer key={answer.selectedAnswer} timeout={10000} onTimeout={onSkipAnswer} />
+                <h2>{QUESTIONS[index].text}</h2>
+                <Answers
+                    answers={QUESTIONS[index].answers} 
+                    selectedAnswers={answer.selectedAnswer}
+                    answerState={answerState}
+                    onSelect={onSelectAnswer}
+                />
+        </div>
+        </div>
+}
+```
+
+**Quiz.jsx** 
+
+```javascript
+import { useState, useCallback } from 'react';
+
+import QUESTIONS from '../questions.js';
+import quizCompleteImg from '../assets/quiz-complete.png';
+import Question from './Question.jsx';
+
+export default function Quiz() {
+    const [userAnswers, setUserAnswers] = useState([]);
+
+    const activeQuestionIndex = userAnswers.length;
+    const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
+
+    const handleSelectAnswer = useCallback(
+        function handleSelectAnswer(selectedAnswer) {
+            setUserAnswers((prevUserAnswers) => {
+                return [...prevUserAnswers, selectedAnswer];
+            });
+        }, 
+        []);
+    
+
+    const handleSkipAnswer = useCallback(() => handleSelectAnswer(null), [handleSelectAnswer] );
+
+    if (quizIsComplete) {
+        return <div id='summary'>
+            <img src={quizCompleteImg} alt="Thropy icon" />
+            <h2>Quiz Completed!</h2>
+        </div>
+    }
+
+    return (
+        <div id='quiz'>
+            <Question
+                key={activeQuestionIndex}
+                index={activeQuestionIndex}
+                onSelectAnswer={handleSelectAnswer}
+                onSkipAnswer={handleSkipAnswer}
+            />
+        </div>
+    )
+}
+```
+
+**QuestionTimer.jsx**
+
+```javascript
+import { useState, useEffect } from "react";
+
+export default function QuestionTimer({ timeout, onTimeout }) {
+    const [remainingTime, setRemainingTime] = useState(timeout);
+
+    useEffect(() => {
+        console.log('SETTING TIMEOUT');
+        const timer = setTimeout(onTimeout, timeout);
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [timeout, onTimeout]);
+    
+    useEffect(() => {
+        console.log('SETTING INTERVAL');
+        const interval = setInterval(() => {
+            setRemainingTime(prevRemainingTime => prevRemainingTime - 100);
+        }, 100);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
+
+    return <progress id="question-time" max={timeout} value={remainingTime} />;
+}
+```
 </details>
